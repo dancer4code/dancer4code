@@ -44,6 +44,9 @@
   <div id="app">
     
       
+      <canvas width="1777" height="841"
+        style="position: fixed; left: 0px; top: 0px; z-index: 99999; pointer-events: none;"></canvas>
+      
     <main class="content on">
       
 <section class="cover">
@@ -174,51 +177,7 @@
   </div>
    
     </div>
-      
-    <div class="article-entry" itemprop="articleBody">
        
-  <h1 id="1-乱码分类"><a href="#1-乱码分类" class="headerlink" title="1.乱码分类"></a>1.乱码分类</h1><ul>
-<li>编辑器乱码（idea,eclipse,notepad）</li>
-<li>数据在页面显示有乱码</li>
-<li>数据到服务器后有乱码</li>
-<li>从服务器返回的有乱码</li>
-<li>使用Ajax收发时有乱码</li>
-<li>数据库乱码</li>
-<li>nginx乱码</li>
-<li>tomcat乱码</li>
-</ul>
-<h1 id="2-解决方案"><a href="#2-解决方案" class="headerlink" title="2.解决方案"></a>2.解决方案</h1><p><strong>A 编辑器乱码（文件乱码），自己百度</strong><br><strong>B 数据在页面显示有乱码</strong><br>1).jsp编码<br> pageEncoding=”utf-8”告诉tomcat，你编译我jsp文件的时候使用他来编译，如果这句话没有，他默认使用charset=utf-8”这句话来编译，同时注意保存jsp的时候使用编码也应该与pageEncoding=”utf-8”保持一致</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;%@ page language&#x3D;&quot;java&quot; contentType&#x3D;&quot;text&#x2F;html; charset&#x3D;utf-8&quot; pageEncoding&#x3D;&quot;utf-8&quot;%&gt;</span><br></pre></td></tr></table></figure>
-<p> 2).html设置编码格式</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta http-equiv&#x3D;&quot;Content-Type&quot; content&#x3D;&quot;text&#x2F;html; charset&#x3D;utf-8&quot; &#x2F;&gt;</span><br></pre></td></tr></table></figure>
-<p>还应该用utf-8格式编辑并保存</p>
-<p>** C 数据到服务器后有乱码**</p>
-<p>通常出现在表单提交数据给服务器,服务器获取时得到的是乱码,以Tomcat为例,出现这种情况是因为没有告诉服务器以什么编码去获取数据,假设页面是以utf-8的编码显示的数据,你填写时没有问题,看起来是没有问题,但是计算机只认识0和1,它在传输过程中是以二进制的样式进入到服务器的,这时你的服务器就不知道它之前是什么编码,如果你没有指定,它就会按照老外的喜好,以iso8859-1的编码去读取,结果就出乱码了.</p>
-<p>这种情况的解决方式又要一分为二,为<code>POST</code>和<code>GET</code>方式,<code>POST</code>解决方案很简单,既然获取时有乱码,那么在获取之前,设置编码即可:<br><code>request.setCharacterEncoding(&quot;utf-8&quot;);</code><br>然后再使用传统方法获取:<br><code>String value = request.getParameter(&quot;value&quot;);</code><br>需要注意,这种设置只对<code>POST</code>提交有效,如果是<code>GET</code>则相对麻烦一点.因为乱码是在调用方法<code>getParameter()</code>时出现的,方法内部的编码肯定出现了问题,既然它不能自动使用<code>UTF-8</code>,那我们就手动来转:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if(request.getMethod().equalsIgnoreCase(&quot;get&quot;))&#123;</span><br><span class="line">      value &#x3D; new String(value.getBytes(&quot;iso8859-1&quot;),&quot;utf-8&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>由于<code>POST</code>提交方式已经得到了解决,我们就只需要在提交方式为GET时进行处理.这样,就能保证服务器获取的数据肯定不是乱码</p>
-<p><strong>D 从服务器返回的有乱码</strong><br>通常只需要设置<code>response</code>的编码:<br><code>response.setCharacterEncoding(&quot;utf-8&quot;);</code><br>然后再设置浏览器的编码为<code>UTF-8</code>或者通知浏览器以<code>UTF-8</code>的编码打开<br><code>response.setContentType(&quot;text/html;charset=utf-8&quot;);</code><br>这样就能保证浏览器收到的是<code>UTF-8</code>的数据,并且显示也没有问题.</p>
-<p><strong>E 使用Ajax收发时有乱码</strong></p>
-<p>**1).**Javascript函数：escape()</p>
-<p> Javascript语言用于编码的函数，一共有三个，最古老的一个就escape()。<br>虽然这个函数现在已经不提倡使用了，但是由于历史原因，很多地方还在使用它，所以有必要先从它讲起。<br>实际上，escape()不能直接用于URL编码，它的真正作用是返回一个字符的Unicode编码值。比如“春节”的返回结果是%u6625%u8282，也就是说在Unicode字符集中，“春”是第6625个（十六进制）字符，“节”是第8282个（十六进制）字符。<br>它的具体规则是，除了ASCII字母、数字、标点符号“@ * _ + - . /”以外，对其他所有字符进行编码。在\u0000到\u00ff之间的符号被转成%xx的形式，其余符号被转成%uxxxx的形式。对应的解码函数是unescape()。<br>所以，“Hello World”的escape()编码就是“Hello%20World”。因为空格的Unicode值是20（十六进制）。<br>还有两个地方需要注意。<br>首先，无论网页的原始编码是什么，一旦被Javascript编码，就都变为unicode字符。也就是说，Javascipt函数的输入和输出，默认都是Unicode字符。这一点对下面两个函数也适用。<br>其次，escape()不对“+”编码。但是我们知道，网页在提交表单的时候，如果有空格，则会被转化为+字符。服务器处理数据的时候，会把+号处理成空格。所以，使用的时候要小心。<br>**2).**Javascript函数：encodeURI()</p>
-<p>encodeURI()是Javascript中真正用来对URL编码的函数。<br>它着眼于对整个URL进行编码，因此除了常见的符号以外，对其他一些在网址中有特殊含义的符号“; / ? : @ &amp; = + $ , #”，也不进行编码。编码后，它输出符号的utf-8形式，并且在每个字节前加上%。<br>它对应的解码函数是decodeURI()。<br>需要注意的是，它不对单引号’编码。</p>
-<p>**3).**Javascript函数：encodeURIComponent()</p>
-<p>最后一个Javascript编码函数是encodeURIComponent()。与encodeURI()的区别是，它用于对URL的组成部分进行个别编码，而不用于对整个URL进行编码。因此，“; / ? : @ &amp; = + $ , #”，这些在encodeURI()中不被编码的符号，在encodeURIComponent()中统统会被编码。至于具体的编码方法，两者是一样。它对应的解码函数是decodeURIComponent()。</p>
-<p><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2010/02/url_encoding.html">关于URL编码</a></p>
-<p><strong>F 数据库(mysql)乱码</strong><br>在java项目中的mysql配置文件中加入：<br><code>?useUnicode=true&amp;characterEncoding=UTF-8</code></p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_42570879/article/details/82912466">解决中文乱码问题大全</a></p>
-<p><strong>G nginx乱码</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#需要修改nginx的server的配置内容，增加一行：charset utf-8;</span><br><span class="line">upstream you.domainName.com &#123;</span><br><span class="line">        server 127.0.0.1:8081;</span><br><span class="line"> &#125;</span><br><span class="line"> server &#123;</span><br><span class="line">      listen      80;</span><br><span class="line">      server_name  you.domainName.com;</span><br><span class="line">      charset utf-8;</span><br><span class="line">      location &#x2F;examples &#123;</span><br><span class="line">        </span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>H tomcat乱码</strong></p>
-<p><em>tomcat/conf/sever.xml</em></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;Connector executor&#x3D;&quot;tomcatThreadPool&quot; port&#x3D;&quot;8080&quot; protocol&#x3D;&quot;HTTP&#x2F;1.1&quot; connectionTimeout&#x3D;&quot;20000&quot; redirectPort&#x3D;&quot;8443&quot; URIEncoding&#x3D;&quot;UTF-8&quot; &#x2F;&gt;</span><br></pre></td></tr></table></figure>
-<p>在tomcat的bin目录下的catalina.bat加如下一条语句<br><code>set JAVA_OPTS=-Xms512m -Xmx1024m -XX:MaxPermSize=1024m -Dfile.encoding=UTF-8</code></p>
-<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/4a09e464f440">Tomcat启动乱码</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/ws379374000/article/details/77100194">各种乱码问题及原理,很全面</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/liushuncheng/p/6891307.html">java web 中有效解决中文乱码问题-pageEncoding与charset区别, response和request的setCharacterEncoding 区别</a></p>
- 
-      <!-- reward -->
-      
-    </div>
-    
 
     <!-- copyright -->
     
@@ -263,127 +222,7 @@
   </div>
    
     </div>
-      
-    <div class="article-entry" itemprop="articleBody">
        
-  <h1 id="1-自动代码"><a href="#1-自动代码" class="headerlink" title="1.自动代码"></a>1.自动代码</h1><p>常用的有<code>fori/sout/psvm+Tab</code>即可生成循环、<code>System.out、main</code>方法等<code>boilerplate</code>样板代码?<br>例如要输入<code>for(User user : users)</code>只需输入<code>user.for+Tab</code><br>再比如，要输入<code>Date birthday = user.getBirthday();</code>只需输入<code>user.getBirthday().var+Tab</code>即可。代码标签输入完成后，按<code>Tab</code>，生成代码。</p>
-<ul>
-<li>Ctrl+Alt+O 优化导入的类和包</li>
-<li>Alt+Insert 生成代码(如get,set方法,构造函数等) ? 或者右键（Generate）</li>
-<li>fori/sout/psvm + Tab</li>
-<li>Ctrl+Alt+T+[home]生成try catch 或者 Alt+enter</li>
-<li>CTRL+ALT+T ?把选中的代码放在 TRY{} IF{} ELSE{} 里</li>
-<li>Ctrl + O 重写方法</li>
-<li>Ctrl + I 实现方法</li>
-<li>Ctr+shift+U 大小写转化</li>
-<li>ALT+回车 导入包,自动修正</li>
-<li>ALT+/  代码提示</li>
-<li>CTRL+J 自动代码</li>
-<li>Ctrl+Shift+J，整合两行为一行</li>
-<li>CTRL+空格  代码提示</li>
-<li>CTRL+SHIFT+SPACE 自动补全代码</li>
-<li>CTRL+ALT+L 格式化代码</li>
-<li>CTRL+ALT+I 自动缩进</li>
-<li>CTRL+ALT+O 优化导入的类和包</li>
-<li>ALT+INSERT 生成代码(如GET,SET方法,构造函数等)</li>
-<li>CTRL+E 最近更改的代码</li>
-<li>CTRL+ALT+SPACE类名或接口名提示</li>
-<li>CTRL+P 方法参数提示</li>
-<li>CTRL+Q，可以看到当前方法的声明</li>
-<li>Shift+F6重构-重命名 (包、类、方法、变量、甚至注释等)</li>
-<li>Ctrl+Alt+V 提取变量</li>
-</ul>
-<h1 id="2-查询快捷键"><a href="#2-查询快捷键" class="headerlink" title="2.查询快捷键"></a>2.查询快捷键</h1><ul>
-<li>Ctrl＋Shift＋Backspace可以跳转到上次编辑的地</li>
-<li>CTRL+ALT+ left/right 前后导航编辑过的地方</li>
-<li>ALT+7 靠左窗口显示当前文件的结构</li>
-<li>Ctrl+F12 浮动显示当前文件的结构</li>
-<li>ALT+F7 找到你的函数或者变量或者类的所有引用到的地方</li>
-<li>CTRL+ALT+F7 ?找到你的函数或者变量或者类的所有引用到的地方</li>
-<li>Ctrl+Shift+Alt+N 查找类中的方法或变量</li>
-<li>双击SHIFT 在项目的所有目录查找文件</li>
-<li>Ctrl+N 查找类</li>
-<li>Ctrl+Shift+N 查找文件</li>
-<li>CTRL+G  定位行</li>
-<li>CTRL+F 在当前窗口查找文本</li>
-<li>CTRL+SHIFT+F 在指定窗口查找文本</li>
-<li>CTRL+R 在 当前窗口替换文本</li>
-<li>CTRL+SHIFT+R 在指定窗口替换文本</li>
-<li>ALT+SHIFT+C 查找修改的文件</li>
-<li>CTRL+E 最近打开的文件</li>
-<li>F3 向下查找关键字出现位置</li>
-<li>SHIFT+F3 向上一个关键字出现位置</li>
-<li>选中文本，按Alt+F3 ，高亮相同文本，F3逐个往下查找相同文本</li>
-<li>F4 查找变量来源</li>
-<li>CTRL+SHIFT+O 弹出显示查找内容</li>
-<li>Ctrl+W 选中代码，连续按会有其他效果</li>
-<li>F2 或Shift+F2 高亮错误或警告快速定位</li>
-<li>Ctrl+Up/Down 光标跳转到第一行或最后一行下</li>
-<li>Ctrl+B 快速打开光标处的类或方法</li>
-<li>CTRL+ALT+B 找所有的子类</li>
-<li>CTRL+SHIFT+B 找变量的类</li>
-<li>Ctrl+Shift+上下键 上下移动代码</li>
-<li>Ctrl+Alt+ left/right 返回至上次浏览的位置</li>
-<li>Ctrl+X 删除行</li>
-<li>Ctrl+D 复制行</li>
-<li>Ctrl+/ 或 Ctrl+Shift+/ 注释（// 或者/<em>…</em>/ ）</li>
-<li>Ctrl+H 显示类结构图</li>
-<li>Ctrl+Q 显示注释文档</li>
-<li>Alt+F1 查找代码所在位置</li>
-<li>Alt+1 快速打开或隐藏工程面板</li>
-<li>Alt+ left/right 切换代码视图</li>
-<li>ALT+ ↑/↓ 在方法间快速移动定位</li>
-<li>CTRL+ALT+ left/right 前后导航编辑过的地方</li>
-<li>Ctrl＋Shift＋Backspace可以跳转到上次编辑的地</li>
-<li>Alt+6 查找TODO</li>
-</ul>
-<h1 id="3-其他快捷键"><a href="#3-其他快捷键" class="headerlink" title="3.其他快捷键"></a>3.其他快捷键</h1><ul>
-<li>SHIFT+ENTER 另起一行</li>
-<li>CTRL+Z  倒退(撤销)</li>
-<li>CTRL+SHIFT+Z 向前(取消撤销)</li>
-<li>CTRL+ALT+F12 资源管理器打开文件夹</li>
-<li>ALT+F1 查找文件所在目录位置</li>
-<li>SHIFT+ALT+INSERT 竖编辑模式</li>
-<li>CTRL+F4 关闭当前窗口</li>
-<li>Ctrl+Alt+V，可以引入变量。例如：new String(); 自动导入变量定义</li>
-<li>Ctrl+~，快速切换方案（界面外观、代码风格、快捷键映射等菜单）</li>
-</ul>
-<h1 id="4-svn快捷键"><a href="#4-svn快捷键" class="headerlink" title="4.svn快捷键"></a>4.svn快捷键</h1><ul>
-<li>ctrl+k 提交代码到SVN?</li>
-<li>ctrl+t 更新代码?</li>
-</ul>
-<h1 id="5-调试快捷键"><a href="#5-调试快捷键" class="headerlink" title="5.调试快捷键"></a>5.调试快捷键</h1><p>其实常用的 就是<code>F8 F7 F9 </code>最值得一提的 就是<code>Drop Frame </code>可以让运行过的代码从头再来</p>
-<ul>
-<li>alt+F8，debug时选中查看值</li>
-<li>Alt+Shift+F9，选择 Debug</li>
-<li>Alt+Shift+F10，选择 Run</li>
-<li>Ctrl+Shift+F9，编译</li>
-<li>Ctrl+Shift+F8，查看断点</li>
-<li>F7，步入</li>
-<li>Shift+F7，智能步入</li>
-<li>Alt+Shift+F7，强制步入</li>
-<li>F8，步过</li>
-<li>Shift+F8，步出</li>
-<li>Alt+Shift+F8，强制步过</li>
-<li>Alt+F9，运行至光标处</li>
-<li>Ctrl+Alt+F9，强制运行至光标处</li>
-<li>F9，恢复程序</li>
-<li>Alt+F10，定位到断点</li>
-</ul>
-<h1 id="6-重构"><a href="#6-重构" class="headerlink" title="6.重构"></a>6.重构</h1><ul>
-<li>Ctrl+Alt+Shift+T，弹出重构菜单</li>
-<li>Shift+F6，重命名</li>
-<li>F6，移动</li>
-<li>F5，复制</li>
-<li>Alt+Delete，安全删除</li>
-<li>Ctrl+Alt+N，内联</li>
-</ul>
-<p><img src="https://upload-images.jianshu.io/upload_images/19382524-c7999eea241ad457.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="idea默认快捷键.png"></p>
- 
-      <!-- reward -->
-      
-    </div>
-    
 
     <!-- copyright -->
     
@@ -428,129 +267,7 @@
   </div>
    
     </div>
-      
-    <div class="article-entry" itemprop="articleBody">
        
-  <ul>
-<li>git init</li>
-<li>git add</li>
-<li>git commit</li>
-<li>git diff</li>
-<li>git checkout</li>
-<li>git status</li>
-<li>git log</li>
-<li>git reset</li>
-<li>git reflog</li>
-</ul>
-<p><code>git reset HEAD &lt;file&gt;</code>可以把暂存区的修改撤销掉（unstage），重新放回工作区：</p>
-<p>还记得如何丢弃工作区的修改吗？<code>git checkout -- readme.txt</code><br><code>git rm test.txt</code></p>
-<p><code>git remote add origin https://gitee.com/ztumj/test3.git</code><br><code>git push -u origin master</code></p>
-<p>首先，我们创建dev分支，然后切换到dev分支：<br><code>$ git checkout -b dev</code><br><em>switched to a new branch ‘dev’</em><br><code>git checkout</code>命令加上-b参数表示创建并切换，相当于以下两条命令：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git branch dev</span><br><span class="line">$ git checkout dev</span><br></pre></td></tr></table></figure>
-<p><em>Switched to branch ‘dev’</em><br>然后，用git branch命令查看当前分支：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git branch</span><br><span class="line">* dev</span><br><span class="line">  master</span><br></pre></td></tr></table></figure>
-
-
-<p>Git鼓励大量使用分支：</p>
-<p>查看分支：<code>git branch</code></p>
-<p>创建分支：<code>git branch &lt;name&gt;</code></p>
-<p>切换分支：<code>git checkout &lt;name&gt;</code></p>
-<p>创建+切换分支：<code>git checkout -b &lt;name&gt;</code></p>
-<p>合并某分支到当前分支：<code>git merge &lt;name&gt;</code></p>
-<p>删除分支：<code>git branch -d &lt;name&gt;</code></p>
-<p><code>git log --graph --pretty=oneline --abbrev-commit</code></p>
-<p>合并分支时，加上<code>--no-ff</code>参数就可以用普通模式合并，合并后的历史有分支，能看出来曾经做过合并，而<code>fast forward</code>合并就看不出来曾经做过合并。<br><code>git merge --no-ff -m &quot;merge with no-ff&quot; dev</code></p>
-<p>并不是你不想提交，而是工作只进行到一半，还没法提交，预计完成还需1天时间。但是，必须在两个小时内修复该bug，怎么办？<br>幸好，Git还提供了一个stash功能，可以把当前工作现场“储藏”起来，等以后恢复现场后继续工作：</p>
-<p><code>$ git stash</code><br>太棒了，原计划两个小时的bug修复只花了5分钟！现在，是时候接着回到dev分支干活了！</p>
-<p><code>$ git checkout dev</code><br><em>Switched to branch ‘dev’</em></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git status</span><br><span class="line">On branch dev</span><br><span class="line">nothing to commit, working tree clean</span><br></pre></td></tr></table></figure>
-<p>工作区是干净的，刚才的工作现场存到哪去了？用git stash list命令看看：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git stash list</span><br><span class="line">stash@&#123;0&#125;: WIP on dev: f52c633 add merge</span><br></pre></td></tr></table></figure>
-<p>工作现场还在，Git把stash内容存在某个地方了，但是需要恢复一下，有两个办法：</p>
-<p>一是用<code>git stash apply</code>恢复，但是恢复后，<code>stash</code>内容并不删除，你需要用<code>git stash drop</code>来删除；</p>
-<p>另一种方式是用<code>git stash pop</code>，恢复的同时把<code>stash</code>内容也删了：</p>
-<p><code>$ git stash pop</code></p>
-<p>在master分支上修复了bug后，我们要想一想，dev分支是早期从master分支分出来的，所以，这个bug其实在当前dev分支上也存在。</p>
-<p>那怎么在dev分支上修复同样的bug？重复操作一次，提交不就行了？</p>
-<p>有木有更简单的方法？</p>
-<p>有！</p>
-<p>同样的bug，要在dev上修复，我们只需要把<code>4c805e2 fix bug 101</code>这个提交所做的修改“复制”到dev分支。注意：我们只想复制<code>4c805e2 fix bug 101</code>这个提交所做的修改，并不是把整个master分支merge过来。</p>
-<p>为了方便操作，Git专门提供了一个<code>cherry-pick</code>命令，让我们能复制一个特定的提交到当前分支：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ git branch</span><br><span class="line">* dev</span><br><span class="line">  master</span><br><span class="line">$ git cherry-pick 4c805e2</span><br><span class="line">[master 1d4b803] fix bug 101</span><br><span class="line"> 1 file changed, 1 insertion(+), 1 deletion(-)</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"> $ git branch -d feature-vulcan</span><br><span class="line">error: The branch &#39;feature-vulcan&#39; is not fully merged.</span><br><span class="line">If you are sure you want to delete it, run &#39;git branch -D feature-vulcan&#39;.</span><br></pre></td></tr></table></figure>
-<p>销毁失败。Git友情提醒，<code>feature-vulcan</code>分支还没有被合并，如果删除，将丢失掉修改，如果要强行删除，需要使用大写的-D参数。。</p>
-<p>现在我们强行删除：</p>
-<p><code>$ git branch -D feature-vulcan</code></p>
-<p>查看远程库信息，使用<code>git remote -v；</code></p>
-<p>本地新建的分支如果不推送到远程，对其他人就是不可见的；</p>
-<p>从本地推送分支，使用<code>git push origin branch-name</code>，如果推送失败，先用<code>git pull</code>抓取远程的新提交；</p>
-<p>在本地创建和远程分支对应的分支，使用<code>git checkout -b branch-name origin/branch-name</code>，本地和远程分支的名称最好一致；</p>
-<p>建立本地分支和远程分支的关联，使用<code>git branch --set-upstream branch-name origin/branch-name；</code></p>
-<p>从远程抓取分支，使用<code>git pull</code>，如果有冲突，要先处理冲突。</p>
-<p><code>rebase</code>操作可以把本地未<code>push</code>的分叉提交历史整理成直线；</p>
-<p><code>rebase</code>的目的是使得我们在查看历史提交的变化时更容易，因为分叉的提交需要三方对比。</p>
-<p>然后，敲命令<code>git tag &lt;name&gt;</code>就可以打一个新标签：</p>
-<p><code>$ git tag v1.0</code><br>可以用命令git tag查看所有标签：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git tag</span><br><span class="line">v1.0</span><br></pre></td></tr></table></figure>
-
-
-<p>如果忘了打标签，比如，现在已经是周五了，但应该在周一打的标签没有打，怎么办？</p>
-<p>方法是找到历史提交的<code>commit id</code>，然后打上就可以了：<br>比方说要对<code>add merge</code>这次提交打标签，它对应的<code>commit id</code>是<code>f52c633</code>，敲入命令：</p>
-<p><code>$ git tag v0.9 f52c633</code></p>
-<p>可以用<code>git show &lt;tagname&gt;</code>查看标签信息：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ git show v0.9</span><br><span class="line">commit f52c63349bc3c1593499807e5c8e972b82c8f286 (tag: v0.9)</span><br><span class="line">Author: Michael Liao &lt;askxuefeng@gmail.com&gt;</span><br><span class="line">Date:   Fri May 18 21:56:54 2018 +0800</span><br><span class="line"></span><br><span class="line">    add merge</span><br><span class="line"></span><br><span class="line">diff --git a&#x2F;readme.txt b&#x2F;readme.txt</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>还可以创建带有说明的标签，用-a指定标签名，-m指定说明文字：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git tag -a v0.1 -m &quot;version 0.1 released&quot; 1094adb</span><br></pre></td></tr></table></figure>
-
-<p>如果标签打错了，也可以删除：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git tag -d v0.1</span><br><span class="line">Deleted tag &#39;v0.1&#39; (was f15b0dd)</span><br></pre></td></tr></table></figure>
-<p>因为创建的标签都只存储在本地，不会自动推送到远程。所以，打错的标签可以在本地安全删除。</p>
-<p>如果要推送某个标签到远程，使用命令<code>git push origin &lt;tagname&gt;</code>：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git push origin v1.0</span><br><span class="line">Total 0 (delta 0), reused 0 (delta 0)</span><br><span class="line">To github.com:michaelliao&#x2F;learngit.git</span><br><span class="line"> * [new tag]         v1.0 -&gt; v1.0</span><br></pre></td></tr></table></figure>
-<p>或者，一次性推送全部尚未推送到远程的本地标签：</p>
-<p>命令<code>git push origin &lt;tagname&gt;</code>可以推送一个本地标签；</p>
-<p>命令<code>git push origin --tags</code>可以推送全部未推送过的本地标签；</p>
-<p>命令<code>git tag -d &lt;tagname&gt;</code>可以删除一个本地标签；</p>
-<p>命令<code>git push origin :refs/tags/&lt;tagname&gt;</code>可以删除一个远程标签。</p>
-<p>有的小伙伴又要问了，一个本地库能不能既关联GitHub，又关联码云呢？</p>
-<p>答案是肯定的，因为git本身是分布式版本控制系统，可以同步到另外一个远程库，当然也可以同步到另外两个远程库。</p>
-<p>使用多个远程库时，我们要注意，git给远程库起的默认名称是<code>origin</code>，如果有多个远程库，我们需要用不同的名称来标识不同的远程库。</p>
-<p>仍然以<code>learngit</code>本地库为例，我们先删除已关联的名为<code>origin</code>的远程库：</p>
-<p><code>git remote rm origin</code><br>然后，先关联GitHub的远程库：</p>
-<p><code>git remote add github git@github.com:michaelliao/learngit.git</code><br>注意，远程库的名称叫<code>github</code>，不叫<code>origin</code>了。</p>
-<p>接着，再关联码云的远程库：</p>
-<p>git remote add gitee <a href="mailto:&#x67;&#x69;&#116;&#x40;&#x67;&#x69;&#116;&#101;&#x65;&#x2e;&#99;&#x6f;&#109;">&#x67;&#x69;&#116;&#x40;&#x67;&#x69;&#116;&#101;&#x65;&#x2e;&#99;&#x6f;&#109;</a>:liaoxuefeng/learngit.git<br>同样注意，远程库的名称叫gitee，不叫origin。</p>
-<p>现在，我们用<code>git remote -v</code>查看远程库信息，可以看到两个远程库：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git remote -v</span><br><span class="line">gitee	git@gitee.com:liaoxuefeng&#x2F;learngit.git (fetch)</span><br><span class="line">gitee	git@gitee.com:liaoxuefeng&#x2F;learngit.git (push)</span><br><span class="line">github	git@github.com:michaelliao&#x2F;learngit.git (fetch)</span><br><span class="line">github	git@github.com:michaelliao&#x2F;learngit.git (push)</span><br></pre></td></tr></table></figure>
-<p>如果要推送到GitHub，使用命令：</p>
-<p><code>git push github master</code><br>如果要推送到码云，使用命令：</p>
-<p><code>git push gitee master</code><br>这样一来，我们的本地库就可以同时与多个远程库互相同步：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">┌─────────┐ ┌─────────┐</span><br><span class="line">│ GitHub  │ │  Gitee  │</span><br><span class="line">└─────────┘ └─────────┘</span><br><span class="line">     ▲           ▲</span><br><span class="line">     └─────┬─────┘</span><br><span class="line">           │</span><br><span class="line">    ┌─────────────┐</span><br><span class="line">    │ Local Repo  │</span><br><span class="line">    └─────────────┘</span><br><span class="line">	</span><br></pre></td></tr></table></figure>
-
-
-<p>有些时候，你想添加一个文件到Git，但发现添加不了，原因是这个文件被<code>.gitignore</code>忽略了：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git add App.class</span><br><span class="line">The following paths are ignored by one of your .gitignore files:</span><br><span class="line">App.class</span><br><span class="line">Use -f if you really want to add them.</span><br></pre></td></tr></table></figure>
-<p>如果你确实想添加该文件，可以用<code>-f</code>强制添加到Git：</p>
-<p><code>$ git add -f App.class</code><br>或者你发现，可能是<code>.gitignore</code>写得有问题，需要找出来到底哪个规则写错了，可以用<code>git check-ignore</code>命令检查：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git check-ignore -v App.class</span><br><span class="line">.gitignore:3:*.class	App.class</span><br></pre></td></tr></table></figure>
-<p>Git会告诉我们，<code>.gitignore</code>的第3行规则忽略了该文件，于是我们就可以知道应该修订哪个规则。</p>
-<p>当然还有别的命令可以简写，很多人都用<code>co</code>表示<code>checkout</code>，<code>ci</code>表示<code>commit</code>，<code>br</code>表示<code>branch</code>：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git config --global alias.co checkout</span><br><span class="line">$ git config --global alias.ci commit</span><br><span class="line">$ git config --global alias.br branch</span><br></pre></td></tr></table></figure>
-<p>以后提交就可以简写成：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git ci -m &quot;bala bala bala...&quot;</span><br></pre></td></tr></table></figure>
-<p><code>--global</code>参数是全局参数，也就是这些命令在这台电脑的所有Git仓库下都有用。</p>
-<p>在撤销修改一节中，我们知道，命令<code>git reset HEAD file</code>可以把暂存区的修改撤销掉（<code>unstage</code>），重新放回工作区。既然是一个<code>unstage</code>操作，就可以配置一个<code>unstage</code>别名：<br><code>$ git config --global alias.unstage &#39;reset HEAD&#39;</code><br>当你敲入命令：</p>
-<p><code>$ git unstage test.py</code><br>实际上Git执行的是：</p>
-<p><code>$ git reset HEAD test.py</code></p>
-<p>甚至还有人丧心病狂地把lg配置成了：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global alias.lg &quot;log --color --graph --pretty&#x3D;format:&#39;%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)&lt;%an&gt;%Creset&#39; --abbrev-commit&quot;</span><br></pre></td></tr></table></figure>
-
-<p>学习自<br><a target="_blank" rel="noopener" href="https://www.liaoxuefeng.com/wiki/896043488029600">Git教程</a><br><a target="_blank" rel="noopener" href="https://www.yiibai.com/git">易百教程/Git教程</a><br><a target="_blank" rel="noopener" href="http://www.git-scm.com.cn/1522.html">Git中文网-GitLab中文网</a></p>
- 
-      <!-- reward -->
-      
-    </div>
-    
 
     <!-- copyright -->
     
@@ -863,6 +580,10 @@
 
 <!-- ClickBoom2 -->
 
+
+<script src="/js/clickBoom2.js"></script>
+
+
 <!-- CodeCopy -->
 
 
@@ -925,6 +646,10 @@
 
 
 <!-- CanvasBackground -->
+
+
+<script src="/js/dz.js"></script>
+
 
 
     
