@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="description" content="我是一位牧码人，快放码过来，" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    java设计模式-1工厂模式 |  D4C的世界
+  </title>
+  <meta name="generator" content="hexo-theme-ayer">
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/dist/main.css">
+
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css">
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+  
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+  
+  
+
+  
+
+<link rel="alternate" href="/atom.xml" title="D4C的世界" type="application/atom+xml">
+</head>
+
+</html>
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-java基础/java设计模式-1工厂模式"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  java设计模式-1工厂模式
+</h1>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/07/03/java%E5%9F%BA%E7%A1%80/java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time datetime="2020-07-03T14:36:00.000Z" itemprop="datePublished">2020-07-03</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Java/">Java</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">2.8k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">11 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>#1.什么是工厂模式</p>
+<blockquote>
+<p>用工厂方法代替了new操作, 将选择实现类, 创建对象统一管理和控制.从而将调用者(Client)与实现类进行解耦.实现了创建者与调用者分离;</p>
+</blockquote>
+<h1 id="2-使用场景"><a href="#2-使用场景" class="headerlink" title="2.使用场景"></a>2.使用场景</h1><ul>
+<li>JDK中Calendar的getInstance方法;</li>
+<li>JDBC中Connection对象的获取;</li>
+<li>MyBatis中SqlSessionFactory创建SqlSession;</li>
+<li>SpringIoC容器创建并管理Bean对象;</li>
+<li>反射Class对象的newInstance;</li>
+<li>。。。。。。</li>
+</ul>
+<p>#3.三种方式</p>
+<ul>
+<li>静态工厂模式</li>
+<li>工厂方法模式</li>
+<li>抽象工厂模式</li>
+</ul>
+<p>#4.具体用法<br>**<em>静态工厂模式**</em></p>
+<blockquote>
+<p>静态工厂模式是工厂模式中最简单的一种，他可以用比较简单的方式隐藏创建对象的细节，一般只需要告诉工厂类所需要的类型，工厂类就会返回需要的产品类，而客户端看到的也只是产品的抽象对象(interface)，因此无需关心到底是返回了哪个子类</p>
+</blockquote>
+<p>例如生产不同产品的例子类图结构如下：<br><img src="https://upload-images.jianshu.io/upload_images/19382524-ebc792482eb45acc.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="简单工厂模式1.jpg"></p>
+<p>具体代码如下：<br><code>1.定义一个产品接口</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">interface Product &#123;</span><br><span class="line">    void produce();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><code>2.实现类</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">public class ProductA implements Product&#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void produce() &#123;</span><br><span class="line">        System.out.println(&quot;生产出了产品A&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class ProductB implements Product&#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void produce() &#123;</span><br><span class="line">        System.out.println(&quot;生产出了产品B&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class ProductC implements Product&#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void produce() &#123;</span><br><span class="line">        System.out.println(&quot;生产出了产品C&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class ProductD implements Product&#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void produce() &#123;</span><br><span class="line">        System.out.println(&quot;生产出了产品D&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class ProductDefault implements Product&#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void produce() &#123;</span><br><span class="line">        System.out.println(&quot;生产出了产品-default&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><code>3.工厂类</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public class ProductFactory &#123;</span><br><span class="line">    public static Product getProduct(String name)&#123;</span><br><span class="line">        switch (name)&#123;</span><br><span class="line">            case &quot;A&quot; :</span><br><span class="line">                return new ProductA();</span><br><span class="line">            case &quot;B&quot;:</span><br><span class="line">                return new ProductB();</span><br><span class="line">            default:</span><br><span class="line">                return new ProductDefault();</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><code>4.测试类</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public class ProductProduceDemo &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        &#x2F;&#x2F;硬编码</span><br><span class="line">        ProductFactory.getProduct(&quot;A&quot;).produce();</span><br><span class="line">        ProductFactory.getProduct(&quot;B&quot;).produce();</span><br><span class="line">        ProductFactory.getProduct(&quot;ggg&quot;).produce();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>优点</strong></p>
+<blockquote>
+<p>隐藏了对象创建的细节，将产品的实例化过程放到了工厂中实现。<br>客户端基本不用关心使用的是哪个产品，只需要知道用工厂的那个方法(或传入什么参数)就行了.<br>方便添加新的产品子类，每次只需要修改工厂类传递的类型值就行了。<br>遵循了依赖倒转原则。</p>
+</blockquote>
+<p><strong>缺点</strong></p>
+<blockquote>
+<p>适用于产品子类型差不多, 使用的方法名都相同的情况.<br>每添加一个产品子类，都必须在工厂类中添加一个判断分支(或一个方法)，这违背了OCP(开放-封闭原则)。</p>
+</blockquote>
+<hr>
+<p><strong><em>工厂方法模式</em></strong></p>
+<blockquote>
+<p>由于静态工厂方法模式不满足OCP, 因此就出现了工厂方法模式; 工厂方法模式和静态工厂模式最大的不同在于: 静态工厂模式只有一个(对于一个项目/独立模块)只有一个工厂类, 而工厂方法模式则有一组实现了相同接口的工厂类.</p>
+</blockquote>
+<p>工厂方法模式就是与静态工厂的差异就是把原来偶合的一个工厂根据业务逻辑分成独立的工厂，这样在增加新的业务时就不需要反复修改同一个工厂类，更符合开闭原则。</p>
+<p><strong>代码：</strong><br><code>1.增加抽象工厂接口</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public interface Factory &#123;</span><br><span class="line">    Product getProduct();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>2.每个产品都实现相应工厂</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public class ProductAFactory implements Factory &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Product getProduct() &#123;</span><br><span class="line">        return new ProductA();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class ProductBFactory implements Factory &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Product getProduct() &#123;</span><br><span class="line">        return new ProductB();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class ProductCFactory implements Factory &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Product getProduct() &#123;</span><br><span class="line">        return new ProductC();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果想要增加一个新的产品ProductD</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public class ProductD implements Product &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void produce() &#123;</span><br><span class="line">        System.out.println(&quot;生产出了产品D&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>需增加一个产品D的工厂类。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class ProductDFactory implements Factory &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Product getProduct() &#123;</span><br><span class="line">        return new ProductD();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>与静态工厂相比似乎实现相应的功能，似乎代码量增加了。但是，相比而言耦合度降低了，更利于程序的扩展。</p>
+<p><code>总结</code><br><strong>优点</strong> </p>
+<blockquote>
+<p>基本与静态工厂模式一致，多的一点优点就是遵循了开放-封闭原则，使得模式的灵活性更强。</p>
+</blockquote>
+<p><strong>缺点</strong></p>
+<blockquote>
+<p>与静态工厂模式差不多, 但是增加了类组织的复杂性;</p>
+</blockquote>
+<blockquote>
+<p>虽然根据理论原则, 需要使用工厂方法模式, 但实际上是用静态工厂模式还是工厂方法模式还是更具实际情况考虑。</p>
+</blockquote>
+<hr>
+<p><strong><em>抽象工厂模式</em></strong></p>
+<blockquote>
+<p>抽象工厂模式: 提供一个创建一系列相关或相互依赖对象的接口, 而无需指定他们具体的类.</p>
+</blockquote>
+<p>抽象工厂模式与工厂方法模式的区别:<br>抽象工厂模式是工厂方法模式的升级版本，他用来创建一组相关或者相互依赖的对象。他与工厂方法模式的区别就在于，工厂方法模式针对的是一个产品等级结构；而抽象工厂模式则是针对的多个产品等级结构. 在编程中，通常一个产品结构，表现为一个接口或者抽象类，也就是说，工厂方法模式提供的所有产品都是衍生自同一个接口或抽象类，而抽象工厂模式所提供的产品则是衍生自不同的接口或抽象类(如下面的Engine,  Seat).<br>在抽象工厂模式中，提出了产品族的概念：所谓的产品族，是指位于不同产品等级结构中功能相关联的产品组成的家族(如Engine,  Seat)。抽象工厂模式所提供的一系列产品就组成一个产品族；而工厂方法提供的一系列产品称为一个等级结构.</p>
+<p><strong>示例:</strong><br>现在我们要生产两款车: 高档(LuxuryCar)与低档(LowCar), 他们分别配有高端引擎(LuxuryEngine),低端引擎(LowEngine),  高端座椅(LuxurySeat)和低端座椅(LowSeat),  下面我们用抽象工厂实现它:<br>LuxuryCarFactory与LowCarFactory分别代表一类产品族的两款产品, 类似于数据库产品族中有MySQL, Oracle, SqlServer</p>
+<p><code>Engine</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">public interface Engine &#123;</span><br><span class="line"></span><br><span class="line">    void start();</span><br><span class="line"></span><br><span class="line">    void run();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class LowEngine implements Engine &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void start() &#123;</span><br><span class="line">        System.out.println(&quot;启动慢 ...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        System.out.println(&quot;转速慢 ...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class LuxuryEngine implements Engine &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void start() &#123;</span><br><span class="line">        System.out.println(&quot;启动快 ...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        System.out.println(&quot;转速快 ...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Seat</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public interface Seat &#123;</span><br><span class="line">    void message();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class LowSeat implements Seat &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void message() &#123;</span><br><span class="line">        System.out.println(&quot;不能按摩 ...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class LuxurySeat implements Seat &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void message() &#123;</span><br><span class="line">        System.out.println(&quot;可提供按摩 ...&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>产品族Factory</code></p>
+<p><code>Factory</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public interface CarFactory &#123;</span><br><span class="line"></span><br><span class="line">    Engine createEngine();</span><br><span class="line"></span><br><span class="line">    Seat createSeat();</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>LuxuryCarFactory</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public class LuxuryCarFactory implements CarFactory &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Engine createEngine() &#123;</span><br><span class="line">        return new LuxuryEngine();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Seat createSeat() &#123;</span><br><span class="line">        return new LuxurySeat();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>LowCarFactory</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public class LowCarFactory implements CarFactory &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Engine createEngine() &#123;</span><br><span class="line">        return new LowEngine();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public Seat createSeat() &#123;</span><br><span class="line">        return new LowSeat();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Client</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class CarTest &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        CarFactory factory &#x3D; new LowCarFactory();</span><br><span class="line">        Engine engine &#x3D; factory.createEngine();</span><br><span class="line">        engine.start();</span><br><span class="line">        engine.run();</span><br><span class="line">        Seat seat &#x3D; factory.createSeat();</span><br><span class="line">        seat.message();</span><br><span class="line">        System.out.println(&quot;---------------separator--------------&quot;);</span><br><span class="line"></span><br><span class="line">        CarFactory factory2 &#x3D; new LuxuryCarFactory();</span><br><span class="line">        Engine engine2 &#x3D; factory.createEngine();</span><br><span class="line">        engine2.start();</span><br><span class="line">        engine2.run();</span><br><span class="line">        Seat seat2 &#x3D; factory.createSeat();</span><br><span class="line">        seat2.message();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><code>总结</code></p>
+<p><strong>优点</strong> </p>
+<blockquote>
+<p>封装了产品的创建，使得不需要知道具体是哪种产品，只需要知道是哪个工厂就行了。<br>可以支持不同类型的产品，使得模式灵活性更强。<br>可以非常方便的使用一族中间的不同类型的产品。</p>
+</blockquote>
+<p><strong>缺点</strong><br>结构太过臃肿，如果产品类型比较多，或者产品族类比较多，就会非常难于管理。<br>每次如果添加一组产品，那么所有的工厂类都必须添加一个方法，这样违背了开放-封闭原则。所以一般适用于产品组合产品族变化不大的情况。</p>
+<hr>
+<p><strong><em>使用静态工厂优化抽象工厂+反射+配置文件</em></strong></p>
+<p>由于抽象工厂模式存在结构臃肿以及改动复杂的缺点(比如我们每次需要构造Car, 都需要进行CarFactory factory = new XxxCarFactory(),而一般一个项目中只会生产一种Car, 如果我们需要更改生产的车的类型, 那么客户端的每一处调用都需要修改), 因此我们可以使用静态工厂对其进行改造, 我们使用CarCreator来统一创建一个产品族不同产品, 这样如果我们的工厂将来更改了产品路线, 改为生产高端车时, 我们仅需改变CAR_TYEP的值就可以了:</p>
+<p><code>CarCreator</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">public class CarCreator &#123;</span><br><span class="line">    private static final String CAR_TYPE &#x3D; &quot;low&quot;;</span><br><span class="line">    private static final String CAR_TYPE_LOW &#x3D; &quot;low&quot;;</span><br><span class="line">    private static final String CAR_TYPE_LUXURY &#x3D; &quot;luxury&quot;;</span><br><span class="line"></span><br><span class="line">    public static Engine createEngine() &#123;</span><br><span class="line">        Engine engine &#x3D; null;</span><br><span class="line">        switch (CAR_TYPE) &#123;</span><br><span class="line">            case CAR_TYPE_LOW:</span><br><span class="line">                engine &#x3D; new LowEngine();</span><br><span class="line">                break;</span><br><span class="line">            case CAR_TYPE_LUXURY:</span><br><span class="line">                engine &#x3D; new LuxuryEngine();</span><br><span class="line">                break;</span><br><span class="line">        &#125;</span><br><span class="line">        return engine;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static Seat createSeat() &#123;</span><br><span class="line">        Seat seat &#x3D; null;</span><br><span class="line">        switch (CAR_TYPE) &#123;</span><br><span class="line">            case CAR_TYPE_LOW:</span><br><span class="line">                seat &#x3D; new LowSeat();</span><br><span class="line">                break;</span><br><span class="line">            case CAR_TYPE_LUXURY:</span><br><span class="line">                seat &#x3D; new LuxurySeat();</span><br><span class="line">                break;</span><br><span class="line">        &#125;</span><br><span class="line">        return seat;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>CarCreatorReflection</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">public class CarCreatorReflection &#123;</span><br><span class="line">    private static String packName;</span><br><span class="line">    private static String carType;</span><br><span class="line">    private static String engine;</span><br><span class="line">    private static String seat;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 读取配置文件内容并判断赋值，初始化变量值</span><br><span class="line">    static &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            URL resource &#x3D; Object.class.getResource(&quot;&#x2F;car.json&quot;);</span><br><span class="line">            File file &#x3D; new File(resource.getFile());</span><br><span class="line">            BufferedReader bufferedReader &#x3D; new BufferedReader(new InputStreamReader(new FileInputStream(file), &quot;UTF-8&quot;));</span><br><span class="line">            StringBuffer config &#x3D; new StringBuffer();</span><br><span class="line">            String s &#x3D; null;</span><br><span class="line">            while ((s &#x3D; bufferedReader.readLine()) !&#x3D; null) &#123;</span><br><span class="line">                config.append(s);</span><br><span class="line">            &#125;</span><br><span class="line">            bufferedReader.close();</span><br><span class="line"></span><br><span class="line">            JSONObject jsonObject &#x3D; JSON.parseObject(config.toString());</span><br><span class="line">            packName &#x3D; jsonObject.getString(&quot;packName&quot;);</span><br><span class="line">            carType &#x3D; jsonObject.getString(&quot;carType&quot;);</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        &#x2F;&#x2F;判断赋值</span><br><span class="line">        switch (carType) &#123;</span><br><span class="line">            case &quot;Low&quot;:</span><br><span class="line">                engine &#x3D; &quot;LowEngine&quot;;</span><br><span class="line">                seat &#x3D; &quot;LowSeat&quot;;</span><br><span class="line">                break;</span><br><span class="line">            case &quot;Luxury&quot;:</span><br><span class="line">                engine &#x3D; &quot;LuxuryEngine&quot;;</span><br><span class="line">                seat &#x3D; &quot;LuxurySeat&quot;;</span><br><span class="line">                break;</span><br><span class="line">            default:</span><br><span class="line">                engine &#x3D; &quot;LuxuryEngine&quot;;</span><br><span class="line">                seat &#x3D; &quot;LuxurySeat&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static Engine createEngine() throws Exception &#123;</span><br><span class="line">        String className &#x3D; packName + &quot;.&quot; + engine;</span><br><span class="line">        return (Engine) Class.forName(className).newInstance();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static Seat createSeat() throws Exception &#123;</span><br><span class="line">        String className &#x3D; packName + &quot;.&quot; + seat;</span><br><span class="line">        return (Seat) Class.forName(className).newInstance();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>配置文件car.json</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;packName&quot;: &quot;com.d4c.demo.factory.abstract1&quot;,</span><br><span class="line">  &quot;carType&quot;: &quot;Luxury&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>测试</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public class CarTest2 &#123;</span><br><span class="line">    public static void main(String[] args) throws Exception&#123;</span><br><span class="line">        Engine engine &#x3D; CarCreator.createEngine();</span><br><span class="line">        engine.run();</span><br><span class="line">        engine.start();</span><br><span class="line">        Seat seat &#x3D; CarCreator.createSeat();</span><br><span class="line">        seat.message();</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;-----------separator-----------&quot;);</span><br><span class="line"></span><br><span class="line">        Engine engine2 &#x3D; CarCreatorReflection.createEngine();</span><br><span class="line">        engine2.run();</span><br><span class="line">        engine2.start();</span><br><span class="line">        Seat seat2 &#x3D; CarCreatorReflection.createSeat();</span><br><span class="line">        seat2.message();</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>result</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">转速慢 ...</span><br><span class="line">启动慢 ...</span><br><span class="line">不能按摩 ...</span><br><span class="line">-----------separator-----------</span><br><span class="line">转速快 ...</span><br><span class="line">启动快 ...</span><br><span class="line">可提供按摩 ...</span><br></pre></td></tr></table></figure>
+
+<p><code>总结</code><br>|分类    |说明|<br>|–|–|<br>|静态工厂模式    |用来生成同一等级结构中的任意产品, 对于增加新的产品, 需要修改已有代码<br>|工厂方法模式|    用来生成同一等级结构的固定产品, 支持增加任意产品;<br>|抽象工厂模式    |用来生成不同产品族的全部产品, 对于增加新的产品无能为力;</p>
+<p><strong>源码</strong>  <a target="_blank" rel="noopener" href="https://gitee.com/dancer4code/spring-boot-lab/tree/master/factory-demo">gitee</a></p>
+<p>文章大部分参考(转载)<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/zjf280441589/article/details/50282773">工厂模式</a><br><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/e55fbddc071c">简单工厂模式（SimpleFactoryPattern）- 最易懂的设计模式解</a><br><a target="_blank" rel="noopener" href="https://blog.51cto.com/zero01/2067822">设计模式之工厂方法模式</a><br><a target="_blank" rel="noopener" href="https://blog.51cto.com/zero01/2070033">设计模式之抽象工厂模式</a><br><a target="_blank" rel="noopener" href="http://www.cnblogs.com/cxjchen/p/3143633.html">三种工厂模式的分析以及C++实现</a> <br><a target="_blank" rel="noopener" href="http://book.douban.com/subject/2334288/">大话设计模式</a> <br><a target="_blank" rel="noopener" href="http://www.bjsxt.com/2014/down_0425/34.html">高淇讲设计模式</a> <br><a target="_blank" rel="noopener" href="http://www.cnblogs.com/dolphin0520/p/3919839.html">设计模式之六大原则</a> <br> <a target="_blank" rel="noopener" href="http://blog.csdn.net/zhengzhb/article/details/7359385">23种设计模式(3) - 抽象工厂模式</a></p>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2020/07/03/java%E5%9F%BA%E7%A1%80/java%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/" rel="tag">Java</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2020/07/03/java%E5%9F%BA%E7%A1%80/java%E5%9F%BA%E7%A1%80-%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            java基础-代理模式
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2020/07/01/java%E5%9F%BA%E7%A1%80/java%E5%9F%BA%E7%A1%80-java%E5%8F%8D%E5%B0%84/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">java基础-java反射</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "chaSYi8FMdJBwzIBpxeNjqWC-gzGzoHsz",
+    app_key: "PqqkLYgPkHvH1BmyQqySWnSK",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2020
+        <i class="ri-heart-fill heart_icon"></i> d4c
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        
+        由 <a href="https://hexo.io" target="_blank">Hexo</a> 强力驱动
+        <span class="division">|</span>
+        主题 - <a href="https://github.com/Shen-Yu/hexo-theme-ayer" target="_blank">Ayer</a>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></s>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+      <div class="float_btns">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+      </div>
+    </main>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-side.svg" alt="D4C的世界"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" target="_blank" rel="noopener" href="https://www.jianshu.com/u/060a97a8dfe1">简书</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <script>
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        document.querySelector('.content').classList.remove('on');
+        document.querySelector('.sidebar').classList.remove('on');
+      }
+    </script>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script>
+
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+
+
+<link rel="stylesheet" href="/css/clipboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+
+
+<!-- CanvasBackground -->
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="52"
+        src="//music.163.com/outchain/player?type=2&id=357126&auto=0&height=32"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+  </div>
+</body>
+
+</html>

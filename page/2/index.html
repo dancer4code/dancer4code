@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="description" content="我是一位牧码人，快放码过来，" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+     D4C的世界
+  </title>
+  <meta name="generator" content="hexo-theme-ayer">
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/dist/main.css">
+
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css">
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+  
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+  
+  
+
+  
+
+<link rel="alternate" href="/atom.xml" title="D4C的世界" type="application/atom+xml">
+</head>
+
+</html>
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      
+<section class="cover">
+    
+      
+      <a class="forkMe" href="https://gitee.com/dancer4code"
+        target="_blank"><img width="149" height="149" src="/images/forkme.png"
+          class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
+    
+  <div class="cover-frame">
+    <div class="bg-box">
+      <img src="/images/cover1.jpg" alt="image frame" />
+    </div>
+    <div class="cover-inner text-center text-white">
+      <h1><a href="/">D4C的世界</a></h1>
+      <div id="subtitle-box">
+        
+        <span id="subtitle"></span>
+        
+      </div>
+      <div>
+        
+      </div>
+    </div>
+  </div>
+  <div class="cover-learn-more">
+    <a href="javascript:void(0)" class="anchor"><i class="ri-arrow-down-line"></i></a>
+  </div>
+</section>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js"></script>
+
+
+<!-- Subtitle -->
+
+  <script>
+    try {
+      var typed = new Typed("#subtitle", {
+        strings: ['面朝大海，春暖花开', '愿你一生努力，一生被爱', '想要的都拥有，得不到的都释怀'],
+        startDelay: 0,
+        typeSpeed: 200,
+        loop: true,
+        backSpeed: 100,
+        showCursor: true
+      });
+    } catch (err) {
+      console.log(err)
+    }
+  </script>
+  
+<div id="main">
+  <section class="outer">
+  
+  
+
+<div class="notice" style="margin-top:50px">
+    <i class="ri-heart-fill"></i>
+    <div class="notice-content" id="broad"></div>
+</div>
+<script type="text/javascript">
+    fetch('https://v1.hitokoto.cn')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("broad").innerHTML = data.hitokoto;
+        })
+        .catch(console.error)
+</script>
+
+<style>
+    .notice {
+        padding: 20px;
+        border: 1px dashed #e6e6e6;
+        color: #969696;
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        background: #fbfbfb50;
+        border-radius: 10px;
+    }
+
+    .notice i {
+        float: left;
+        color: #999;
+        font-size: 16px;
+        padding-right: 10px;
+        vertical-align: middle;
+        margin-top: -2px;
+    }
+
+    .notice-content {
+        display: initial;
+        vertical-align: middle;
+    }
+</style>
+  
+  <article class="articles">
+    
+    
+    
+    
+    <article
+  id="post-spring-boot/自定义过滤器filter"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/08/11/spring-boot/%E8%87%AA%E5%AE%9A%E4%B9%89%E8%BF%87%E6%BB%A4%E5%99%A8filter/"
+    >自定义过滤器filter</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/08/11/spring-boot/%E8%87%AA%E5%AE%9A%E4%B9%89%E8%BF%87%E6%BB%A4%E5%99%A8filter/" class="article-date">
+  <time datetime="2020-08-11T14:36:00.000Z" itemprop="datePublished">2020-08-11</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring-boot/">spring boot</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>#这里介绍两种几种种自定义filter的方式</p>
+<ul>
+<li>通过<code>@WebFilter</code>+<code>@ServletComponentScan</code>的方式</li>
+<li>通过配置<code>FilterRegistrationBean</code>的方式</li>
+<li>通过加注解<code>@component</code>等注入的方式</li>
+</ul>
+<p>##1.通过<code>@WebFilter</code>+<code>@ServletComponentScan</code>的方式</p>
+<p><code>filter类</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.custombean.filter;</span><br><span class="line"></span><br><span class="line">import lombok.extern.slf4j.Slf4j;</span><br><span class="line">import org.springframework.core.annotation.Order;</span><br><span class="line"></span><br><span class="line">import javax.servlet.*;</span><br><span class="line">import javax.servlet.annotation.WebFilter;</span><br><span class="line">import java.io.IOException;</span><br><span class="line"></span><br><span class="line">@Slf4j</span><br><span class="line">@Order(1)</span><br><span class="line">@WebFilter(filterName &#x3D; &quot;firstName&quot;,urlPatterns &#x3D; &quot;&#x2F;hello&#x2F;*&quot;)</span><br><span class="line">public class FirstFilter implements Filter &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void init(FilterConfig filterConfig) throws ServletException &#123;</span><br><span class="line">        log.info(&quot;FirstFilter init--------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException &#123;</span><br><span class="line">        log.info(&quot;FirstFilter doFilter--------&quot;);</span><br><span class="line">        filterChain.doFilter(servletRequest,servletResponse);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void destroy() &#123;</span><br><span class="line">        log.info(&quot;FirstFilter destroy--------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>启动类上要加<code>@ServletComponentScan</code></strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.custombean;</span><br><span class="line"></span><br><span class="line">import org.springframework.boot.SpringApplication;</span><br><span class="line">import org.springframework.boot.autoconfigure.SpringBootApplication;</span><br><span class="line">import org.springframework.boot.web.servlet.ServletComponentScan;</span><br><span class="line"></span><br><span class="line">@ServletComponentScan</span><br><span class="line">@SpringBootApplication</span><br><span class="line">public class CustomBeanApplication &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        SpringApplication.run(CustomBeanApplication.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>@WebFilter常用属性</strong></p>
+<table>
+<thead>
+<tr>
+<th align="center">属性</th>
+<th align="center">类型</th>
+<th align="center">是否必需</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">asyncSupported</td>
+<td align="center">boolean</td>
+<td align="center">否</td>
+<td align="center">指定Filter是否支持异步模式</td>
+</tr>
+<tr>
+<td align="center">dispatcherTypes</td>
+<td align="center">DispatcherType[]</td>
+<td align="center">否</td>
+<td align="center">指定Filter对哪种方式的请求进行过滤。 支持的属性：ASYNC、ERROR、FORWARD、INCLUDE、REQUEST； 默认过滤所有方式的请求</td>
+</tr>
+<tr>
+<td align="center">filterName</td>
+<td align="center">String</td>
+<td align="center">否</td>
+<td align="center">Filter名称</td>
+</tr>
+<tr>
+<td align="center">initParams</td>
+<td align="center">WebInitParam[]</td>
+<td align="center">否</td>
+<td align="center">配置参数</td>
+</tr>
+<tr>
+<td align="center">displayName</td>
+<td align="center">String</td>
+<td align="center">否</td>
+<td align="center">Filter显示名</td>
+</tr>
+<tr>
+<td align="center">servletNames</td>
+<td align="center">String[]</td>
+<td align="center">否</td>
+<td align="center">指定对哪些Servlet进行过滤</td>
+</tr>
+<tr>
+<td align="center">urlPatterns/value</td>
+<td align="center">String[]</td>
+<td align="center">否</td>
+<td align="center">两个属性作用相同，指定拦截的路径</td>
+</tr>
+</tbody></table>
+<p><strong>过滤器的urlPatterns的过滤路径规则：</strong></p>
+<ul>
+<li>1.全路径匹配： /hello/do.html</li>
+<li>2.部分路径匹配： /hello/*</li>
+<li>3.通配符匹配 ：/*</li>
+<li>4.后缀名匹配 ：*.html(注意:前面不加/)</li>
+</ul>
+<p><strong>@Order</strong><br>@Orde注解是决定着执行顺序，而不是类的初始化顺序。order数字越小，优先级越高。<code>最好，统一用一种方式定义filter，否则@Order可能不起作用（混乱）。</code></p>
+<p>#2.通过配置<code>FilterRegistrationBean</code>的方式</p>
+<p><code>filter类</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.custombean.filter;</span><br><span class="line"></span><br><span class="line">import lombok.extern.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line">import javax.servlet.*;</span><br><span class="line">import java.io.IOException;</span><br><span class="line"></span><br><span class="line">@Slf4j</span><br><span class="line">public class SecondFilter implements Filter &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void init(FilterConfig filterConfig) throws ServletException &#123;</span><br><span class="line">        log.info(&quot;SecondFilter init--------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException &#123;</span><br><span class="line">        log.info(&quot;SecondFilter doFilter--------&quot;);</span><br><span class="line">        filterChain.doFilter(servletRequest,servletResponse);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void destroy() &#123;</span><br><span class="line">        log.info(&quot;SecondFilter destroy--------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><code>配置类</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.custombean.config;</span><br><span class="line"></span><br><span class="line">import com.d4c.custombean.filter.SecondFilter;</span><br><span class="line">import org.springframework.boot.web.servlet.FilterRegistrationBean;</span><br><span class="line">import org.springframework.context.annotation.Bean;</span><br><span class="line">import org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line">@Configuration</span><br><span class="line">public class MyRegisterBean &#123;</span><br><span class="line"></span><br><span class="line">    @Bean</span><br><span class="line">    public FilterRegistrationBean filterRegistrationBean()&#123;</span><br><span class="line">        FilterRegistrationBean bean &#x3D; new FilterRegistrationBean();</span><br><span class="line">        &#x2F;&#x2F;注册自定义过滤器</span><br><span class="line">        bean.setFilter(new SecondFilter());</span><br><span class="line">        &#x2F;&#x2F;过滤器名称</span><br><span class="line">        bean.setName(&quot;second filter bean&quot;);</span><br><span class="line">        &#x2F;&#x2F;过滤所有路径</span><br><span class="line">        bean.addUrlPatterns(&quot;&#x2F;do&#x2F;*&quot;);</span><br><span class="line">        &#x2F;&#x2F;优先级，数字越小，优先级越高</span><br><span class="line">        bean.setOrder(2);</span><br><span class="line">        return bean;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>#3.通过加注解<code>@Component</code>等注入的方式<br><strong>虽然这种方式能实现filter，但是不推荐。最好第一种或第二种方式选其一</strong></p>
+<p><code>filter类</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.custombean.filter;</span><br><span class="line"></span><br><span class="line">import lombok.extern.slf4j.Slf4j;</span><br><span class="line">import org.springframework.context.annotation.Bean;</span><br><span class="line">import org.springframework.context.annotation.Configuration;</span><br><span class="line">import org.springframework.core.annotation.Order;</span><br><span class="line">import org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line">import javax.servlet.*;</span><br><span class="line">import javax.servlet.annotation.WebFilter;</span><br><span class="line">import java.io.IOException;</span><br><span class="line"></span><br><span class="line">@Slf4j</span><br><span class="line">@Order(3)</span><br><span class="line">&#x2F;&#x2F;或者用@Configuration</span><br><span class="line">@Component   </span><br><span class="line">public class ThirdFilter implements Filter &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void init(FilterConfig filterConfig) throws ServletException &#123;</span><br><span class="line">        log.info(&quot;ThirdFilter init--------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException &#123;</span><br><span class="line">        log.info(&quot;ThirdFilter doFilter--------&quot;);</span><br><span class="line">        filterChain.doFilter(servletRequest,servletResponse);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void destroy() &#123;</span><br><span class="line">        log.info(&quot;ThirdFilter destroy--------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/filter/" rel="tag">filter</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/" rel="tag">spring boot</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-spring-boot/自定义servlet"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/08/10/spring-boot/%E8%87%AA%E5%AE%9A%E4%B9%89servlet/"
+    >自定义servlet</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/08/10/spring-boot/%E8%87%AA%E5%AE%9A%E4%B9%89servlet/" class="article-date">
+  <time datetime="2020-08-10T14:36:00.000Z" itemprop="datePublished">2020-08-10</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring-boot/">spring boot</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>#两种方式</p>
+<ul>
+<li>@WebServlet注解+@ServletComponentScan</li>
+<li>通过配置FilterRegistrationBean的方式</li>
+</ul>
+<hr>
+<p>##1. @WebServlet注解+@ServletComponentScan</p>
+<p><code>servlet</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.custombean.servlet;</span><br><span class="line"></span><br><span class="line">import lombok.extern.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line">import javax.servlet.*;</span><br><span class="line">import javax.servlet.annotation.WebServlet;</span><br><span class="line">import java.io.IOException;</span><br><span class="line"></span><br><span class="line">@Slf4j</span><br><span class="line">@WebServlet(name&#x3D;&quot;FirstServlet&quot;,urlPatterns &#x3D; &quot;&#x2F;servlet&#x2F;*&quot;,loadOnStartup &#x3D; 1)</span><br><span class="line">public class FirstServlet implements Servlet &#123;</span><br><span class="line"></span><br><span class="line">    private ServletConfig servletConfig;</span><br><span class="line">    private ServletRequest servletRequest;</span><br><span class="line">    private ServletResponse servletResponse;</span><br><span class="line">    @Override</span><br><span class="line">    public void init(ServletConfig config) throws ServletException &#123;</span><br><span class="line">        this.servletConfig &#x3D; config;</span><br><span class="line">        log.info(&quot;FirstServlet init-------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public ServletConfig getServletConfig() &#123;</span><br><span class="line">        return servletConfig;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException &#123;</span><br><span class="line">        log.info(&quot;FirstServlet service-------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String getServletInfo() &#123;</span><br><span class="line">        return servletRequest.getServletContext().getServerInfo();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void destroy() &#123;</span><br><span class="line">        log.info(&quot;FirstServlet destroy-------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><code>启动类</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.custombean;</span><br><span class="line"></span><br><span class="line">import org.springframework.boot.SpringApplication;</span><br><span class="line">import org.springframework.boot.autoconfigure.SpringBootApplication;</span><br><span class="line">import org.springframework.boot.web.servlet.ServletComponentScan;</span><br><span class="line"></span><br><span class="line">@ServletComponentScan</span><br><span class="line">@SpringBootApplication</span><br><span class="line">public class CustomBeanApplication &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        SpringApplication.run(CustomBeanApplication.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>@WebServlet常用属性</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">属性</th>
+<th align="left">类型</th>
+<th align="left">是否必须</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">asyncSupported</td>
+<td align="left">boolean</td>
+<td align="left">否</td>
+<td align="left">指定Servlet是否支持异步操作模式</td>
+</tr>
+<tr>
+<td align="left">displayName</td>
+<td align="left">String</td>
+<td align="left">否</td>
+<td align="left">指定Servlet显示名称</td>
+</tr>
+<tr>
+<td align="left">initParams</td>
+<td align="left">WebInitParam[]</td>
+<td align="left">否</td>
+<td align="left">配置初始化参数</td>
+</tr>
+<tr>
+<td align="left">loadOnStartup</td>
+<td align="left">int</td>
+<td align="left">否</td>
+<td align="left">标记容器是否在应用启动时就加载这个Servlet</td>
+</tr>
+<tr>
+<td align="left">name</td>
+<td align="left">String</td>
+<td align="left">否</td>
+<td align="left">指定Servlet名称</td>
+</tr>
+<tr>
+<td align="left">urlPatterns/value</td>
+<td align="left">String[]</td>
+<td align="left">否</td>
+<td align="left">这两个属性作用相同，指定Servlet处理的url</td>
+</tr>
+</tbody></table>
+<p><strong>也可以继承HttpServlet</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.custombean.servlet;</span><br><span class="line"></span><br><span class="line">import lombok.extern.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line">import javax.servlet.*;</span><br><span class="line">import javax.servlet.annotation.WebServlet;</span><br><span class="line">import javax.servlet.http.HttpServlet;</span><br><span class="line">import javax.servlet.http.HttpServletRequest;</span><br><span class="line">import javax.servlet.http.HttpServletResponse;</span><br><span class="line">import java.io.IOException;</span><br><span class="line"></span><br><span class="line">@Slf4j</span><br><span class="line">@WebServlet(name&#x3D;&quot;SecondServlet&quot;,urlPatterns &#x3D; &quot;&#x2F;servlet2&#x2F;*&quot;,loadOnStartup &#x3D; 2)</span><br><span class="line">public class SecondServlet extends HttpServlet &#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;</span><br><span class="line">        log.info(&quot;SecondServlet doGet-------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;</span><br><span class="line">        log.info(&quot;SecondServlet doPost-------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void init() throws ServletException &#123;</span><br><span class="line">        log.info(&quot;SecondServlet init-------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void destroy() &#123;</span><br><span class="line">        log.info(&quot;SecondServlet destroy-------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<p>##2.通过配置FilterRegistrationBean的方式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.custombean.servlet;</span><br><span class="line"></span><br><span class="line">import lombok.extern.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line">import javax.servlet.ServletException;</span><br><span class="line">import javax.servlet.annotation.WebServlet;</span><br><span class="line">import javax.servlet.http.HttpServlet;</span><br><span class="line">import javax.servlet.http.HttpServletRequest;</span><br><span class="line">import javax.servlet.http.HttpServletResponse;</span><br><span class="line">import java.io.IOException;</span><br><span class="line"></span><br><span class="line">@Slf4j</span><br><span class="line">@WebServlet(name&#x3D;&quot;ThirdServlet&quot;,urlPatterns &#x3D; &quot;&#x2F;servlet3&#x2F;*&quot;,loadOnStartup &#x3D; 3)</span><br><span class="line">public class ThirdServlet extends HttpServlet &#123;</span><br><span class="line">    @Override</span><br><span class="line">    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;</span><br><span class="line">        log.info(&quot;ThirdServlet doGet-------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException &#123;</span><br><span class="line">        log.info(&quot;ThirdServlet doPost-------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void init() throws ServletException &#123;</span><br><span class="line">        log.info(&quot;ThirdServlet init-------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void destroy() &#123;</span><br><span class="line">        log.info(&quot;ThirdServlet destroy-------&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.custombean.config;</span><br><span class="line"></span><br><span class="line">import com.d4c.custombean.filter.SecondFilter;</span><br><span class="line">import com.d4c.custombean.servlet.ThirdServlet;</span><br><span class="line">import org.springframework.boot.web.servlet.FilterRegistrationBean;</span><br><span class="line">import org.springframework.boot.web.servlet.ServletRegistrationBean;</span><br><span class="line">import org.springframework.context.annotation.Bean;</span><br><span class="line">import org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line">@Configuration</span><br><span class="line">public class MyRegisterBean &#123;</span><br><span class="line"></span><br><span class="line">    @Bean</span><br><span class="line">    public ServletRegistrationBean servletRegistrationBean()&#123;</span><br><span class="line">        ServletRegistrationBean bean &#x3D; new ServletRegistrationBean();</span><br><span class="line">        &#x2F;&#x2F;注册自定义过滤器</span><br><span class="line">        bean.setServlet(new ThirdServlet());</span><br><span class="line">        &#x2F;&#x2F;过滤器名称</span><br><span class="line">        bean.setName(&quot;ThirdServlet&quot;);</span><br><span class="line">        &#x2F;&#x2F;过滤所有路径</span><br><span class="line">        bean.addUrlMappings(&quot;&#x2F;servlet3&quot;);</span><br><span class="line">        &#x2F;&#x2F;优先级</span><br><span class="line">        bean.setOrder(3);</span><br><span class="line">        return bean;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<p><strong>推荐用第二种</strong></p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/servlet/" rel="tag">servlet</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/" rel="tag">spring boot</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-spring-boot/自定义listener"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/08/09/spring-boot/%E8%87%AA%E5%AE%9A%E4%B9%89listener/"
+    >自定义listener</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/08/09/spring-boot/%E8%87%AA%E5%AE%9A%E4%B9%89listener/" class="article-date">
+  <time datetime="2020-08-09T14:36:00.000Z" itemprop="datePublished">2020-08-09</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring-boot/">spring boot</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>#两种方式，一种是基于注解，另一种通过注册bean注册</p>
+<hr>
+<p>#方式一：基于注解</p>
+<p><code>@WebListener</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.custombean.listener;</span><br><span class="line"></span><br><span class="line">import lombok.extern.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line">import javax.servlet.*;</span><br><span class="line">import javax.servlet.annotation.WebListener;</span><br><span class="line">import javax.servlet.http.*;</span><br><span class="line"></span><br><span class="line">@WebListener</span><br><span class="line">@Slf4j</span><br><span class="line">public class MyServletContextListener implements ServletContextListener, ServletContextAttributeListener, HttpSessionListener,</span><br><span class="line">        HttpSessionAttributeListener, HttpSessionBindingListener,HttpSessionActivationListener,HttpSessionIdListener,</span><br><span class="line">        ServletRequestListener,ServletRequestAttributeListener</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;ServletContextAttributeListener</span><br><span class="line">    @Override</span><br><span class="line">    public void attributeAdded(ServletContextAttributeEvent scae) &#123;</span><br><span class="line">        log.info(&quot;ServletContextAttributeListener attributeAdded-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void attributeRemoved(ServletContextAttributeEvent scae) &#123;</span><br><span class="line">        log.info(&quot;ServletContextAttributeListener attributeRemoved-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void attributeReplaced(ServletContextAttributeEvent scae) &#123;</span><br><span class="line">        log.info(&quot;ServletContextAttributeListener attributeReplaced-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;ServletContextListener</span><br><span class="line">    @Override</span><br><span class="line">    public void contextInitialized(ServletContextEvent sce) &#123;</span><br><span class="line">        log.info(&quot;ServletContextListener contextInitialized-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void contextDestroyed(ServletContextEvent sce) &#123;</span><br><span class="line">        log.info(&quot;ServletContextListener contextDestroyed-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;HttpSessionIdListener</span><br><span class="line">    @Override</span><br><span class="line">    public void sessionIdChanged(HttpSessionEvent se, String oldSessionId) &#123;</span><br><span class="line">        log.info(&quot;HttpSessionIdListener sessionIdChanged-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;HttpSessionActivationListener</span><br><span class="line">    @Override</span><br><span class="line">    public void sessionWillPassivate(HttpSessionEvent se) &#123;</span><br><span class="line">        log.info(&quot;HttpSessionActivationListener sessionWillPassivate-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void sessionDidActivate(HttpSessionEvent se) &#123;</span><br><span class="line">        log.info(&quot;HttpSessionActivationListener sessionDidActivate-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;HttpSessionAttributeListener</span><br><span class="line">    @Override</span><br><span class="line">    public void attributeAdded(HttpSessionBindingEvent se) &#123;</span><br><span class="line">        log.info(&quot;HttpSessionAttributeListener attributeAdded-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void attributeRemoved(HttpSessionBindingEvent se) &#123;</span><br><span class="line">        log.info(&quot;HttpSessionAttributeListener attributeRemoved-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void attributeReplaced(HttpSessionBindingEvent se) &#123;</span><br><span class="line">        log.info(&quot;HttpSessionAttributeListener attributeReplaced-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;HttpSessionBindingListener</span><br><span class="line">    @Override</span><br><span class="line">    public void valueBound(HttpSessionBindingEvent event) &#123;</span><br><span class="line">        log.info(&quot;HttpSessionBindingListener valueBound-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void valueUnbound(HttpSessionBindingEvent event) &#123;</span><br><span class="line">        log.info(&quot;HttpSessionBindingListener valueUnbound-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;HttpSessionListener</span><br><span class="line">    @Override</span><br><span class="line">    public void sessionCreated(HttpSessionEvent se) &#123;</span><br><span class="line">        log.info(&quot;HttpSessionListener sessionCreated-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void sessionDestroyed(HttpSessionEvent se) &#123;</span><br><span class="line">        log.info(&quot;HttpSessionBindingListener sessionDestroyed-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;ServletRequestAttributeListener</span><br><span class="line">    @Override</span><br><span class="line">    public void attributeAdded(ServletRequestAttributeEvent srae) &#123;</span><br><span class="line">        log.info(&quot;ServletRequestAttributeListener attributeAdded-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void attributeRemoved(ServletRequestAttributeEvent srae) &#123;</span><br><span class="line">        log.info(&quot;ServletRequestAttributeListener attributeRemoved-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void attributeReplaced(ServletRequestAttributeEvent srae) &#123;</span><br><span class="line">        log.info(&quot;ServletRequestAttributeListener attributeReplaced-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;ServletRequestListener</span><br><span class="line">    @Override</span><br><span class="line">    public void requestDestroyed(ServletRequestEvent sre) &#123;</span><br><span class="line">        log.info(&quot;ServletRequestListener requestDestroyed-----&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void requestInitialized(ServletRequestEvent sre) &#123;</span><br><span class="line">        log.info(&quot;ServletRequestListener requestInitialized-----&quot;);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">Servlet事件监听器</span><br><span class="line"> 在Servlet技术中已经定义了一些事件，</span><br><span class="line"> 并且我们可以针对这些事件来编写相关的事件监听器，从而对事件作出相应处理。</span><br><span class="line"> Servlet事件主要有3类：Servlet上下文事件、会话事件与请求事件</span><br><span class="line"> 下面具体讲解这3类事件的监听器实现。</span><br><span class="line"> </span><br><span class="line"> 1．对Servlet上下文进行监听</span><br><span class="line"> 可以监听ServletContext对象的创建和删除以及属性的添加、删除和修改等操作。该监听器需要使用到如下两个接口类：</span><br><span class="line">     ● ServletContextAttributeListener：监听对ServletContext属性的操作，如增加、删除、修改操作。</span><br><span class="line">     ● ServletContextListener：监听ServletContext，</span><br><span class="line">         当创建ServletContext时，激发contextInitialized (ServletContextEvent sce)方法。</span><br><span class="line">         当销毁ServletContext时，激发contextDestroyed(ServletContext- Event sce)方法。</span><br><span class="line"> </span><br><span class="line"> 2．监听Http会话</span><br><span class="line"> 可以监听Http会话活动情况、Http会话中属性设置情况，也可以监听Http会话的active、paasivate情况等。该监听器需要使用到如下多个接口类：</span><br><span class="line">   ● HttpSessionListener：监听HttpSession的操作。</span><br><span class="line">         当创建一个Session时，激发session Created (SessionEvent se)方法；</span><br><span class="line">         当销毁一个Session时，激发sessionDestroyed (HttpSessionEvent se)方法。</span><br><span class="line">   ● HttpSessionActivationListener：用于监听Http会话active、passivate情况。</span><br><span class="line">   ● HttpSessionAttributeListener：监听HttpSession中属性的操作。</span><br><span class="line">         当在Session增加一个属性时，激发attributeAdded(HttpSessionBindingEvent se) 方法；</span><br><span class="line">         当在Session删除一个属性时，激发attributeRemoved(HttpSessionBindingEvent se)方法；</span><br><span class="line">         当在Session属性被重新设置时，激发attributeReplaced(HttpSessionBindingEvent se) 方法。</span><br><span class="line">   ● HttpSessionBindingListener：监听HttpSession绑定和解绑</span><br><span class="line">   ● HttpSessionIdListener：</span><br><span class="line"></span><br><span class="line">       </span><br><span class="line"> 3．对客户端请求进行监听</span><br><span class="line"> 对客户端的请求进行监听是在Servlet 2.4规范中新添加的一项技术，使用的接口类如下：</span><br><span class="line">     ● ServletRequestListener接口类。</span><br><span class="line">     ● ServletRequestAttrubuteListener接口类</span><br><span class="line">   </span><br></pre></td></tr></table></figure>
+
+
+<p>#方式二：基于ServletListenerRegistrationBean</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.custombean.config;</span><br><span class="line"></span><br><span class="line">import com.d4c.custombean.filter.SecondFilter;</span><br><span class="line">import com.d4c.custombean.listener.MyServletListener;</span><br><span class="line">import com.d4c.custombean.servlet.ThirdServlet;</span><br><span class="line">import org.springframework.boot.web.servlet.FilterRegistrationBean;</span><br><span class="line">import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;</span><br><span class="line">import org.springframework.boot.web.servlet.ServletRegistrationBean;</span><br><span class="line">import org.springframework.context.annotation.Bean;</span><br><span class="line">import org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line">@Configuration</span><br><span class="line">public class MyRegisterBean &#123;</span><br><span class="line"></span><br><span class="line">    @Bean</span><br><span class="line">    public ServletListenerRegistrationBean servletListenerRegistrationBean()&#123;</span><br><span class="line">        ServletListenerRegistrationBean bean &#x3D; new ServletListenerRegistrationBean();</span><br><span class="line">        &#x2F;&#x2F;注册自定义Listener</span><br><span class="line">        bean.setListener(new MyServletListener());</span><br><span class="line">        bean.setEnabled(true);</span><br><span class="line">        &#x2F;&#x2F;路径</span><br><span class="line">        bean.setOrder(3);</span><br><span class="line">        return bean;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>引用文章</strong></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/kongxianghao/p/6961843.html">java web Listener的简单使用案例</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq1021979964/article/details/88633586">Spring Boot—(3)整合Web三大组件（Servlet，Filter过滤器，Listener监听器</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/zhizhuodewo6/article/details/82019409">servlet注解 @WebListener</a><br><a target="_blank" rel="noopener" href="https://www.iteye.com/blog/hy2012-2207902">HttpSessionListener与HttpSessionBindingListener之间区别</a></p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/listener/" rel="tag">listener</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/" rel="tag">spring boot</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-spring-boot/简单自定义spring-boot启动器starter"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/08/08/spring-boot/%E7%AE%80%E5%8D%95%E8%87%AA%E5%AE%9A%E4%B9%89spring-boot%E5%90%AF%E5%8A%A8%E5%99%A8starter/"
+    >简单自定义spring-boot启动器starter</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/08/08/spring-boot/%E7%AE%80%E5%8D%95%E8%87%AA%E5%AE%9A%E4%B9%89spring-boot%E5%90%AF%E5%8A%A8%E5%99%A8starter/" class="article-date">
+  <time datetime="2020-08-08T14:36:00.000Z" itemprop="datePublished">2020-08-08</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring-boot/">spring boot</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="1-引入依赖"><a href="#1-引入依赖" class="headerlink" title="1.引入依赖"></a>1.引入依赖</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;project xmlns&#x3D;&quot;http:&#x2F;&#x2F;maven.apache.org&#x2F;POM&#x2F;4.0.0&quot;</span><br><span class="line">         xmlns:xsi&#x3D;&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2001&#x2F;XMLSchema-instance&quot;</span><br><span class="line">         xsi:schemaLocation&#x3D;&quot;http:&#x2F;&#x2F;maven.apache.org&#x2F;POM&#x2F;4.0.0 http:&#x2F;&#x2F;maven.apache.org&#x2F;xsd&#x2F;maven-4.0.0.xsd&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;parent&gt;</span><br><span class="line">        &lt;groupId&gt;org.springframework.boot&lt;&#x2F;groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;spring-boot-starter-parent&lt;&#x2F;artifactId&gt;</span><br><span class="line">        &lt;version&gt;2.1.6.RELEASE&lt;&#x2F;version&gt;</span><br><span class="line">    &lt;&#x2F;parent&gt;</span><br><span class="line"></span><br><span class="line">    &lt;modelVersion&gt;4.0.0&lt;&#x2F;modelVersion&gt;</span><br><span class="line">    &lt;groupId&gt;com.d4c.study&lt;&#x2F;groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;starter-demo-spring-boot-starter&lt;&#x2F;artifactId&gt;</span><br><span class="line">    &lt;version&gt;1.0.0.RELEASE&lt;&#x2F;version&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &lt;dependencies&gt;</span><br><span class="line">        &lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;org.springframework.boot&lt;&#x2F;groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;spring-boot-configuration-processor&lt;&#x2F;artifactId&gt;</span><br><span class="line">            &lt;optional&gt;true&lt;&#x2F;optional&gt;</span><br><span class="line">        &lt;&#x2F;dependency&gt;</span><br><span class="line">        &lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;org.springframework.boot&lt;&#x2F;groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;spring-boot-autoconfigure&lt;&#x2F;artifactId&gt;</span><br><span class="line">        &lt;&#x2F;dependency&gt;</span><br><span class="line">    &lt;&#x2F;dependencies&gt;</span><br><span class="line"></span><br><span class="line">&lt;&#x2F;project&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>因为是spring Boot启动器，所以要指定parent为：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;parent&gt;</span><br><span class="line">      &lt;groupId&gt;org.springframework.boot&lt;&#x2F;groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;spring-boot-starter-parent&lt;&#x2F;artifactId&gt;</span><br><span class="line">      &lt;version&gt;2.1.6.RELEASE&lt;&#x2F;version&gt;</span><br><span class="line">  &lt;&#x2F;parent&gt;</span><br></pre></td></tr></table></figure>
+<p><strong>spring-boot-configuration-processor</strong></p>
+<blockquote>
+<p>spring-boot-configuration-processor的作用是编译时生成 spring-configuration-metadata.json ，此文件主要给IDE使用。如当配置此jar相关配置属性在 application.yml ，你可以用ctlr+鼠标左键点击属性名，IDE会跳转到你配置此属性的类中。<br>我们日常使用的Spring官方的Starter一般采取spring-boot-starter-{name} 的命名方式，如 spring-boot-starter-web 。<br>而非官方的Starter，官方建议 artifactId 命名应遵循{name}-spring-boot-starter 的格式。 例如：mybatis-spring-boot-starter  。</p>
+</blockquote>
+<p><strong>spring-boot-autoconfigure</strong><br>spring-boot-autoconfigure主要是要用到其中的一些注解</p>
+<h1 id="2-定义属性类，用于读取，接受配置文件中的值"><a href="#2-定义属性类，用于读取，接受配置文件中的值" class="headerlink" title="2.定义属性类，用于读取，接受配置文件中的值"></a>2.定义属性类，用于读取，接受配置文件中的值</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.starter.autoconfigure;</span><br><span class="line"></span><br><span class="line">import org.springframework.boot.context.properties.ConfigurationProperties;</span><br><span class="line"></span><br><span class="line">@ConfigurationProperties(&quot;simple.string&quot;)</span><br><span class="line">public class SimpleProperties &#123;</span><br><span class="line">    private String value;</span><br><span class="line"></span><br><span class="line">    public String getValue() &#123;</span><br><span class="line">        return value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setValue(String value) &#123;</span><br><span class="line">        this.value &#x3D; value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>@ConfigurationProperties与@EnableConfigurationProperties配合使用，实现了配置文件的读取，与引入。</p>
+<h1 id="3-定义功能实现类"><a href="#3-定义功能实现类" class="headerlink" title="3.定义功能实现类"></a>3.定义功能实现类</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.starter.autoconfigure;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public class StringResolvedBean &#123;</span><br><span class="line">    private String config;</span><br><span class="line"></span><br><span class="line">    public StringResolvedBean(String config) &#123;</span><br><span class="line">        this.config &#x3D; config;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String[] split(String separatorChar) &#123;</span><br><span class="line">        return config.split(separatorChar);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="4-自动配置类"><a href="#4-自动配置类" class="headerlink" title="4.自动配置类"></a>4.自动配置类</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.starter.autoconfigure;</span><br><span class="line"></span><br><span class="line">import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;</span><br><span class="line">import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;</span><br><span class="line">import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;</span><br><span class="line">import org.springframework.boot.context.properties.EnableConfigurationProperties;</span><br><span class="line">import org.springframework.context.annotation.Bean;</span><br><span class="line">import org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line">@Configuration</span><br><span class="line">@ConditionalOnClass(StringResolvedBean.class)</span><br><span class="line">@EnableConfigurationProperties(SimpleProperties.class)</span><br><span class="line">public class SimpleStringAutoConfiguration &#123;</span><br><span class="line"></span><br><span class="line">    @Bean</span><br><span class="line">    @ConditionalOnMissingBean</span><br><span class="line">    @ConditionalOnProperty(prefix &#x3D; &quot;simple.string&quot;, value &#x3D; &quot;enabled&quot;, havingValue &#x3D; &quot;true&quot;)</span><br><span class="line">    StringResolvedBean starterInit(SimpleProperties simpleProperties) &#123;</span><br><span class="line">        return new StringResolvedBean(simpleProperties.getValue());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="4-1-有关条件的注解"><a href="#4-1-有关条件的注解" class="headerlink" title="4.1 有关条件的注解"></a>4.1 有关条件的注解</h2><blockquote>
+<p>@ConditionalOnBean:当容器中有指定的Bean的条件下<br>@ConditionalOnClass：当类路径下有指定的类的条件下<br>@ConditionalOnExpression:基于SpEL表达式作为判断条件<br>@ConditionalOnJava:基于JVM版本作为判断条件<br>@ConditionalOnJndi:在JNDI存在的条件下查找指定的位置<br>@ConditionalOnMissingBean:当容器中没有指定Bean的情况下<br>@ConditionalOnMissingClass:当类路径下没有指定的类的条件下<br>@ConditionalOnNotWebApplication:当前项目不是Web项目的条件下<br>@ConditionalOnProperty:指定的属性是否有指定的值<br>@ConditionalOnResource:类路径下是否有指定的资源<br>@ConditionalOnSingleCandidate:当指定的Bean在容器中只有一个，或者在有多个Bean的情况下，用来指定首选的Bean @ConditionalOnWebApplication:当前项目是Web项目的条件下 </p>
+</blockquote>
+<p>#5.创建spring.factories</p>
+<blockquote>
+<p>在resources/META-INF/下创建spring.factories文件，并添加如下内容：<br>org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.d4c.starter.autoconfigure.SimpleStringAutoConfiguration</p>
+</blockquote>
+<h1 id="6-项目路径参考"><a href="#6-项目路径参考" class="headerlink" title="6.项目路径参考"></a>6.项目路径参考</h1><p><img src="https://upload-images.jianshu.io/upload_images/19382524-fe3490d220742aff.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<h1 id="7-打包到本地仓库"><a href="#7-打包到本地仓库" class="headerlink" title="7.打包到本地仓库"></a>7.打包到本地仓库</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#切到项目根目录，执行mvn命令</span><br><span class="line">mvn install</span><br></pre></td></tr></table></figure>
+
+<h1 id="8-其他本地项目就可以maven-dependency引入了"><a href="#8-其他本地项目就可以maven-dependency引入了" class="headerlink" title="8.其他本地项目就可以maven dependency引入了"></a>8.其他本地项目就可以maven dependency引入了</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;com.d4c.study&lt;&#x2F;groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;starter-demo-spring-boot-starter&lt;&#x2F;artifactId&gt;</span><br><span class="line">        &lt;version&gt;1.0.0.RELEASE&lt;&#x2F;version&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>application.yml</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">server:</span><br><span class="line">  port: 6011</span><br><span class="line">simple:</span><br><span class="line">  string:</span><br><span class="line">    enabled: true</span><br><span class="line">    value: 12,aa,bb,cc</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/" rel="tag">spring boot</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-spring-boot/读书笔记-spring-boot跨域问题"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/08/07/spring-boot/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-spring-boot%E8%B7%A8%E5%9F%9F%E9%97%AE%E9%A2%98/"
+    >读书笔记-spring-boot跨域问题</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/08/07/spring-boot/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-spring-boot%E8%B7%A8%E5%9F%9F%E9%97%AE%E9%A2%98/" class="article-date">
+  <time datetime="2020-08-07T14:36:00.000Z" itemprop="datePublished">2020-08-07</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring-boot/">spring boot</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <blockquote>
+<p>CORS(Cross Origin Resource Sharing,跨域资源共享)机制允许web应用服务器允许跨域访问控制，从而是跨域数据传输得以安全进行。</p>
+</blockquote>
+<h1 id="1-跨域"><a href="#1-跨域" class="headerlink" title="1.跨域"></a>1.跨域</h1><p>##1.1含义<br>1995年，同源政策由 Netscape 公司引入浏览器。目前，所有浏览器都实行这个政策。<br>最初，它的含义是指，A网页设置的 Cookie，B网页不能打开，除非这两个网页”同源”。所谓”同源”指的是”三个相同”。</p>
+<ul>
+<li>协议相同</li>
+<li>域名相同</li>
+<li>端口相同</li>
+</ul>
+<p>举例来说，<code>http://www.example.com/dir/page.html</code>这个网址，协议是<code>http://</code>，域名是<code>www.example.com</code>，端口是<code>80</code>（默认端口可以省略）。它的同源情况如下。<br><code>http://www.example.com/dir2/other.html</code>：同源<br><code>http://example.com/dir/other.html</code>：不同源（域名不同）<br><code>http://v2.www.example.com/dir/other.html</code>：不同源（域名不同）<br><code>http://www.example.com:81/dir/other.html</code>：不同源（端口不同）<br>##1.2 目的<br>同源政策的目的，是为了保证用户信息的安全，防止恶意的网站窃取数据。<br>设想这样一种情况：A网站是一家银行，用户登录以后，又去浏览其他网站。如果其他网站可以读取A网站的 Cookie，会发生什么？</p>
+<p>很显然，如果 Cookie 包含隐私（比如存款总额），这些信息就会泄漏。更可怕的是，Cookie 往往用来保存用户的登录状态，如果用户没有退出登录，其他网站就可以冒充用户，为所欲为。因为浏览器同时还规定，提交表单不受同源政策的限制。<br>由此可见，”同源政策”是必需的，否则 Cookie 可以共享，互联网就毫无安全可言了。</p>
+<p>##1.3 限制范围<br>随着互联网的发展，”同源政策”越来越严格。目前，如果非同源，共有三种行为受到限制。</p>
+<ul>
+<li><p>（1） Cookie、LocalStorage 和 IndexDB 无法读取。</p>
+</li>
+<li><p>（2） DOM 无法获得。</p>
+</li>
+<li><p>（3） AJAX 请求不能发送。</p>
+</li>
+</ul>
+<p>虽然这些限制是必要的，但是有时很不方便，合理的用途也受到影响。下面，我将详细介绍，如何规避上面三种限制。</p>
+<p>引用自<a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2016/04/same-origin-policy.html">浏览器同源政策及其规避方法</a></p>
+<p>#2.在spring boot中允许跨域访问</p>
+<p>##2.1方法级别的跨域访问<br>spring boot提供了一种简单的声明式方法来实现跨域请求。使用@CrossOrigin注解实现。</p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/" rel="tag">spring boot</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-spring-boot/spring-boot用aop做统一请求日志处理"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/08/06/spring-boot/spring-boot%E7%94%A8aop%E5%81%9A%E7%BB%9F%E4%B8%80%E8%AF%B7%E6%B1%82%E6%97%A5%E5%BF%97%E5%A4%84%E7%90%86/"
+    >spring-boot用aop做统一请求日志处理</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/08/06/spring-boot/spring-boot%E7%94%A8aop%E5%81%9A%E7%BB%9F%E4%B8%80%E8%AF%B7%E6%B1%82%E6%97%A5%E5%BF%97%E5%A4%84%E7%90%86/" class="article-date">
+  <time datetime="2020-08-06T14:36:00.000Z" itemprop="datePublished">2020-08-06</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring-boot/">spring boot</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>#1.定义切面、切点@Aspect+@Pointcut</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.exception.demo.aspect;</span><br><span class="line"></span><br><span class="line">import lombok.extern.slf4j.Slf4j;</span><br><span class="line">import org.aspectj.lang.JoinPoint;</span><br><span class="line">import org.aspectj.lang.annotation.*;</span><br><span class="line">import org.springframework.stereotype.Component;</span><br><span class="line">import org.springframework.web.context.request.RequestContextHolder;</span><br><span class="line">import org.springframework.web.context.request.ServletRequestAttributes;</span><br><span class="line"></span><br><span class="line">import javax.servlet.http.HttpServletRequest;</span><br><span class="line"></span><br><span class="line">&#x2F;**</span><br><span class="line"> * Created with IntelliJ IDEA.</span><br><span class="line"> * User: liangqing.zhao(zlq)</span><br><span class="line"> * Date: 2019&#x2F;10&#x2F;9 20:54</span><br><span class="line"> * Description:</span><br><span class="line"> *&#x2F;</span><br><span class="line">@Aspect</span><br><span class="line">@Component</span><br><span class="line">@Slf4j</span><br><span class="line">public class HttpAspect &#123;</span><br><span class="line">    @Pointcut(&quot;execution(public * com.d4c.exception.demo.controller.*.*(..))&quot;)</span><br><span class="line">    public void pointCut()&#123;&#125;</span><br><span class="line"></span><br><span class="line">    @Before(&quot;pointCut()&quot;)</span><br><span class="line">    public void doBefore(JoinPoint joinPoint)&#123;</span><br><span class="line">        ServletRequestAttributes attributes&#x3D; (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();</span><br><span class="line">        HttpServletRequest request &#x3D; attributes.getRequest();</span><br><span class="line">        log.info(&quot;url&#x3D;&#123;&#125;&quot;,request.getRequestURL());</span><br><span class="line">        &#x2F;&#x2F;method</span><br><span class="line">        log.info(&quot;method&#x3D;&#123;&#125;&quot;, request.getMethod());</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;ip</span><br><span class="line">        log.info(&quot;ip&#x3D;&#123;&#125;&quot;, request.getRemoteAddr());</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;类方法</span><br><span class="line">        log.info(&quot;method&#x3D;&#123;&#125;&quot;, joinPoint.getSignature().getDeclaringTypeName() + &quot;.&quot; + joinPoint.getSignature().getName());</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F;参数</span><br><span class="line">        log.info(&quot;args&#x3D;&#123;&#125;&quot;, joinPoint.getArgs());</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @After(&quot;pointCut()&quot;)</span><br><span class="line">    public void doAfter()&#123;</span><br><span class="line">        log.info(&quot;-----after------&quot;);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    @AfterReturning(returning &#x3D; &quot;object&quot;,pointcut &#x3D; &quot;pointCut()&quot;)</span><br><span class="line">    public void doAfterReturning(Object object)&#123;</span><br><span class="line">        log.info(&quot;return&#x3D;&#123;&#125;&quot;,object);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>#2.简单接口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.exception.demo.controller;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">import com.d4c.exception.demo.pojo.ResultInfo;</span><br><span class="line">import com.d4c.exception.demo.pojo.Student;</span><br><span class="line">import com.d4c.exception.demo.service.StudentService;</span><br><span class="line">import com.d4c.exception.demo.utils.ResultInfoOldUtil;</span><br><span class="line">import com.d4c.exception.demo.utils.ResultInfoUtil;</span><br><span class="line">import org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line">import org.springframework.util.StringUtils;</span><br><span class="line">import org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line">import org.springframework.web.bind.annotation.RequestParam;</span><br><span class="line">import org.springframework.web.bind.annotation.RestController;</span><br><span class="line"></span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#x2F;**</span><br><span class="line"> * Created with IntelliJ IDEA.</span><br><span class="line"> * User: liangqing.zhao(zlq)</span><br><span class="line"> * Date: 2019&#x2F;10&#x2F;4 18:16</span><br><span class="line"> * Description:</span><br><span class="line"> *&#x2F;</span><br><span class="line">@RestController</span><br><span class="line">@RequestMapping(&quot;student&quot;)</span><br><span class="line">public class StudentController &#123;</span><br><span class="line">    @Autowired</span><br><span class="line">    private StudentService studentService;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;add&quot;)</span><br><span class="line">    public ResultInfo add() &#123;</span><br><span class="line">        Student stu &#x3D; new Student(null, &quot;黄麒英&quot;, 48);</span><br><span class="line">        studentService.insert(stu);</span><br><span class="line">        return ResultInfoUtil.success();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;getOne&quot;)</span><br><span class="line">    public ResultInfo getOne(@RequestParam(required &#x3D; false) String id) &#123;</span><br><span class="line">        Student student &#x3D; studentService.get(id);</span><br><span class="line">        return ResultInfoUtil.success(student);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;findByIdFirst&quot;)</span><br><span class="line">    public Student findByIdFirst(@RequestParam String id) &#123;</span><br><span class="line">        return studentService.findById(id).orElse(null);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;findAllFirst&quot;)</span><br><span class="line">    public List&lt;Student&gt; findByIdFirst() &#123;</span><br><span class="line">        return studentService.list();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;findByIdSecond&quot;)</span><br><span class="line">    public ResultInfo findByIdSecond(@RequestParam String id) &#123;</span><br><span class="line">        Student stu &#x3D; studentService.findById(id).orElse(null);</span><br><span class="line">        ResultInfo resultInfo &#x3D; new ResultInfo();</span><br><span class="line">        resultInfo.setCode(1);</span><br><span class="line">        resultInfo.setMsg(&quot;成功！&quot;);</span><br><span class="line">        resultInfo.setData(stu);</span><br><span class="line">        return resultInfo;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;findAllSecond&quot;)</span><br><span class="line">    public ResultInfo findByIdSecond() &#123;</span><br><span class="line">        List&lt;Student&gt; listStudent &#x3D; studentService.list();</span><br><span class="line">        ResultInfo resultInfo &#x3D; new ResultInfo();</span><br><span class="line">        resultInfo.setCode(1);</span><br><span class="line">        resultInfo.setMsg(&quot;成功！&quot;);</span><br><span class="line">        resultInfo.setData(listStudent);</span><br><span class="line">        return resultInfo;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;findByIdThird&quot;)</span><br><span class="line">    public ResultInfo findByIdThird(@RequestParam String id) &#123;</span><br><span class="line">        Student stu &#x3D; studentService.findById(id).orElse(null);</span><br><span class="line">        return ResultInfoOldUtil.success(stu);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;findAllThird&quot;)</span><br><span class="line">    public ResultInfo findByIdThird() &#123;</span><br><span class="line">        List&lt;Student&gt; listStudent &#x3D; studentService.list();</span><br><span class="line">        return ResultInfoOldUtil.success(listStudent);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;findByIdFourth&quot;)</span><br><span class="line">    public ResultInfo findByIdFourth(@RequestParam String id) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            Student stu &#x3D; studentService.findById(id).orElse(null);</span><br><span class="line">            Integer count &#x3D; 1 &#x2F; 0;</span><br><span class="line">            return ResultInfoOldUtil.success(stu);</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            return ResultInfoOldUtil.error();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;findAllFourth&quot;)</span><br><span class="line">    public ResultInfo findByIdFourth() throws Exception &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            List&lt;Student&gt; listStudent &#x3D; studentService.list();</span><br><span class="line">            throw new Exception(&quot;出现异常&quot;);</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            return ResultInfoOldUtil.error();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;findByIdFifth&quot;)</span><br><span class="line">    public ResultInfo findByIdFifth(@RequestParam String id) &#123;</span><br><span class="line">        Student stu &#x3D; studentService.findById(id).orElse(null);</span><br><span class="line">        Integer count &#x3D; 1 &#x2F; 0;</span><br><span class="line">        return ResultInfoOldUtil.success(stu);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;findAllFifth&quot;)</span><br><span class="line">    public ResultInfo findByIdFifth() throws Exception &#123;</span><br><span class="line">        List&lt;Student&gt; listStudent &#x3D; studentService.list();</span><br><span class="line">        throw new Exception(&quot;出现异常&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;findById&quot;)</span><br><span class="line">    public ResultInfo findById(@RequestParam(required &#x3D; false) String id) &#123;</span><br><span class="line">        Student byId &#x3D; studentService.findById(id).orElse(null);</span><br><span class="line">        return ResultInfoUtil.success(byId);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @RequestMapping(&quot;findAll&quot;)</span><br><span class="line">    public ResultInfo findAll() &#123;</span><br><span class="line">        List&lt;Student&gt; list &#x3D; studentService.list();</span><br><span class="line">        return ResultInfoUtil.success(list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>#3.请求接口测试<br><img src="https://upload-images.jianshu.io/upload_images/19382524-bf53c04a0082b03a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="请求地址"></p>
+<p>#4.结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">2019-10-09 23:02:09 [http-nio-8000-exec-4] INFO  com.d4c.exception.demo.aspect.HttpAspect -url&#x3D;http:&#x2F;&#x2F;localhost:8000&#x2F;student&#x2F;findAll</span><br><span class="line">2019-10-09 23:02:09 [http-nio-8000-exec-4] INFO  com.d4c.exception.demo.aspect.HttpAspect -method&#x3D;GET</span><br><span class="line">2019-10-09 23:02:09 [http-nio-8000-exec-4] INFO  com.d4c.exception.demo.aspect.HttpAspect -ip&#x3D;0:0:0:0:0:0:0:1</span><br><span class="line">2019-10-09 23:02:09 [http-nio-8000-exec-4] INFO  com.d4c.exception.demo.aspect.HttpAspect -method&#x3D;com.d4c.exception.demo.controller.StudentController.findAll</span><br><span class="line">2019-10-09 23:02:09 [http-nio-8000-exec-4] INFO  com.d4c.exception.demo.aspect.HttpAspect -args&#x3D;&#123;&#125;</span><br><span class="line">Hibernate: select student0_.id as id1_0_, student0_.age as age2_0_, student0_.name as name3_0_ from student student0_</span><br><span class="line">2019-10-09 23:02:09 [http-nio-8000-exec-4] INFO  com.d4c.exception.demo.aspect.HttpAspect ------after------</span><br><span class="line">2019-10-09 23:02:09 [http-nio-8000-exec-4] INFO  com.d4c.exception.demo.aspect.HttpAspect -return&#x3D;ResultInfo(code&#x3D;1, msg&#x3D;success, data&#x3D;[Student(id&#x3D;d4c-04b6feca-a37c-4942-9042-d9da28c167fe, na</span><br></pre></td></tr></table></figure>
+
+<p>每个方法都拦截了，并打印出信息。搞定了</p>
+<p>想自定义日志信息可以参考<code>logback.xml</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;utf-8&quot; ?&gt;</span><br><span class="line">&lt;!-- 从高到地低 OFF 、 FATAL 、 ERROR 、 WARN 、 INFO 、 DEBUG 、 TRACE 、 ALL --&gt;</span><br><span class="line">&lt;!-- 日志输出规则  根据当前ROOT 级别，日志输出时，级别高于root默认的级别时  会输出 --&gt;</span><br><span class="line">&lt;!-- 以下  每个配置的 filter 是过滤掉输出文件里面，会出现高级别文件，依然出现低级别的日志信息，通过filter 过滤只记录本级别的日志--&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- 属性描述 scan：性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true scanPeriod:设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，</span><br><span class="line">默认单位是毫秒。当scan为true时，此属性生效。默认的时间间隔为1分钟。debug:当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。 --&gt;</span><br><span class="line">&lt;configuration scan&#x3D;&quot;false&quot; scanPeriod&#x3D;&quot;60 seconds&quot; debug&#x3D;&quot;false&quot;&gt;</span><br><span class="line">    &lt;!-- 定义日志文件 输入位置 --&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;logPath&quot; value&#x3D;&quot;d:&#x2F;test_log&quot; &#x2F;&gt;</span><br><span class="line">    &lt;!-- 日志最大的历史 30天 --&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;maxHistory&quot; value&#x3D;&quot;30&quot;&#x2F;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- 配置项， 通过此节点配置日志输出位置（控制台、文件、数据库）、输出格式等--&gt;</span><br><span class="line">    &lt;!-- ConsoleAppender代表输出到控制台 --&gt;</span><br><span class="line">    &lt;appender name&#x3D;&quot;consoleLog&quot; class&#x3D;&quot;ch.qos.logback.core.ConsoleAppender&quot;&gt;</span><br><span class="line">        &lt;!-- layout代表输出格式 --&gt;</span><br><span class="line">        &lt;layout class&#x3D;&quot;ch.qos.logback.classic.PatternLayout&quot;&gt;</span><br><span class="line">            &lt;pattern&gt;%d&#123;yyyy-MM-dd HH:mm:ss&#125; [%thread] %highlight(%-5level) %cyan(%logger) -%.-100msg%n&lt;&#x2F;pattern&gt;</span><br><span class="line">        &lt;&#x2F;layout&gt;</span><br><span class="line">    &lt;&#x2F;appender&gt;</span><br><span class="line">    &lt;!-- 日志输出文件 --&gt;</span><br><span class="line">    &lt;appender name&#x3D;&quot;fileInfoLog&quot; class&#x3D;&quot;ch.qos.logback.core.rolling.RollingFileAppender&quot;&gt;</span><br><span class="line">        &lt;encoder&gt;</span><br><span class="line">            &lt;pattern&gt;%d&#123;yyyy-MM-dd HH:mm:ss&#125; [%thread] %-5level %logger -%msg%n&lt;&#x2F;pattern&gt;</span><br><span class="line">        &lt;&#x2F;encoder&gt;</span><br><span class="line">        &lt;!-- 滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件 RollingFileAppender--&gt;</span><br><span class="line">        &lt;!-- 滚动策略，它根据时间来制定滚动策略.既负责滚动也负责触发滚动 --&gt;</span><br><span class="line">        &lt;rollingPolicy class&#x3D;&quot;ch.qos.logback.core.rolling.TimeBasedRollingPolicy&quot;&gt;</span><br><span class="line">            &lt;!-- 输出路径 --&gt;</span><br><span class="line">            &lt;fileNamePattern&gt;$&#123;logPath&#125;&#x2F;info&#x2F;%d.log&lt;&#x2F;fileNamePattern&gt;</span><br><span class="line">            &lt;!-- 可选节点，控制保留的归档文件的最大数量，超出数量就删除旧文件假设设置每个月滚动，且&lt;maxHistory&gt;是6，</span><br><span class="line">            则只保存最近6个月的文件，删除之前的旧文件。注意，删除旧文件是，那些为了归档而创建的目录也会被删除--&gt;</span><br><span class="line">            &lt;maxHistory&gt;$&#123;maxHistory&#125;&lt;&#x2F;maxHistory&gt;</span><br><span class="line">        &lt;&#x2F;rollingPolicy&gt;</span><br><span class="line">        &lt;!-- 按照固定窗口模式生成日志文件，当文件大于20MB时，生成新的日志文件。窗口大小是1到3，当保存了3个归档文件后，将覆盖最早的日志。</span><br><span class="line">        &lt;rollingPolicy class&#x3D;&quot;ch.qos.logback.core.rolling.FixedWindowRollingPolicy&quot;&gt;</span><br><span class="line">          &lt;fileNamePattern&gt;$&#123;logPath&#125;&#x2F;%d&#123;yyyy-MM-dd&#125;&#x2F;.log.zip&lt;&#x2F;fileNamePattern&gt;</span><br><span class="line">          &lt;minIndex&gt;1&lt;&#x2F;minIndex&gt;</span><br><span class="line">          &lt;maxIndex&gt;3&lt;&#x2F;maxIndex&gt;</span><br><span class="line">        &lt;&#x2F;rollingPolicy&gt;   --&gt;</span><br><span class="line">        &lt;!-- 查看当前活动文件的大小，如果超过指定大小会告知RollingFileAppender 触发当前活动文件滚动</span><br><span class="line">        &lt;triggeringPolicy class&#x3D;&quot;ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy&quot;&gt;</span><br><span class="line">            &lt;maxFileSize&gt;5MB&lt;&#x2F;maxFileSize&gt;</span><br><span class="line">        &lt;&#x2F;triggeringPolicy&gt;   --&gt;</span><br><span class="line">    &lt;&#x2F;appender&gt;</span><br><span class="line">    &lt;!-- 特殊记录Error日志 --&gt;</span><br><span class="line">    &lt;appender name&#x3D;&quot;fileErrorLog&quot; class&#x3D;&quot;ch.qos.logback.core.rolling.RollingFileAppender&quot;&gt;</span><br><span class="line">        &lt;!-- 只记录ERROR级别日志，添加范围过滤，可以将该类型的日志特殊记录到某个位置 --&gt;</span><br><span class="line">        &lt;filter class&#x3D;&quot;ch.qos.logback.classic.filter.ThresholdFilter&quot;&gt;</span><br><span class="line">            &lt;level&gt;ERROR&lt;&#x2F;level&gt;</span><br><span class="line">        &lt;&#x2F;filter&gt;</span><br><span class="line">        &lt;encoder&gt;</span><br><span class="line">            &lt;pattern&gt;%d&#123;yyyy-MM-dd HH:mm:ss&#125; [%thread] %-5level %logger -%msg%n&lt;&#x2F;pattern&gt;</span><br><span class="line">        &lt;&#x2F;encoder&gt;</span><br><span class="line">        &lt;rollingPolicy class&#x3D;&quot;ch.qos.logback.core.rolling.TimeBasedRollingPolicy&quot;&gt;</span><br><span class="line">            &lt;fileNamePattern&gt;$&#123;logPath&#125;&#x2F;error&#x2F;%d.log&lt;&#x2F;fileNamePattern&gt;</span><br><span class="line">            &lt;!-- 日志最大的历史 60天 --&gt;</span><br><span class="line">            &lt;maxHistory&gt;60&lt;&#x2F;maxHistory&gt;</span><br><span class="line">        &lt;&#x2F;rollingPolicy&gt;</span><br><span class="line">    &lt;&#x2F;appender&gt;</span><br><span class="line">    &lt;appender name&#x3D;&quot;fileWarnLog&quot; class&#x3D;&quot;ch.qos.logback.core.rolling.RollingFileAppender&quot;&gt;</span><br><span class="line">        &lt;!-- 只记录ERROR级别日志，添加范围过滤，可以将该类型的日志特殊记录到某个位置 --&gt;</span><br><span class="line">        &lt;filter class&#x3D;&quot;ch.qos.logback.classic.filter.ThresholdFilter&quot;&gt;</span><br><span class="line">            &lt;level&gt;WARN&lt;&#x2F;level&gt;</span><br><span class="line">        &lt;&#x2F;filter&gt;</span><br><span class="line">        &lt;encoder&gt;</span><br><span class="line">            &lt;pattern&gt;%d&#123;yyyy-MM-dd HH:mm:ss&#125; [%thread] %-5level %logger -%msg%n&lt;&#x2F;pattern&gt;</span><br><span class="line">        &lt;&#x2F;encoder&gt;</span><br><span class="line">        &lt;rollingPolicy class&#x3D;&quot;ch.qos.logback.core.rolling.TimeBasedRollingPolicy&quot;&gt;</span><br><span class="line">            &lt;fileNamePattern&gt;$&#123;logPath&#125;&#x2F;warn&#x2F;%d.log&lt;&#x2F;fileNamePattern&gt;</span><br><span class="line">            &lt;!-- 日志最大的历史 60天 --&gt;</span><br><span class="line">            &lt;maxHistory&gt;60&lt;&#x2F;maxHistory&gt;</span><br><span class="line">        &lt;&#x2F;rollingPolicy&gt;</span><br><span class="line">    &lt;&#x2F;appender&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- 根节点，表名基本的日志级别，里面可以由多个appender规则 --&gt;</span><br><span class="line">    &lt;!-- level&#x3D;&quot;ALL&quot;代表基础日志级别为ALL --&gt;</span><br><span class="line">    &lt;root level&#x3D;&quot;info&quot;&gt;</span><br><span class="line">        &lt;!-- 引入控制台输出规则 --&gt;</span><br><span class="line">        &lt;appender-ref ref&#x3D;&quot;consoleLog&quot; &#x2F;&gt;</span><br><span class="line">        &lt;appender-ref ref&#x3D;&quot;fileInfoLog&quot; &#x2F;&gt;</span><br><span class="line">        &lt;appender-ref ref&#x3D;&quot;fileErrorLog&quot; &#x2F;&gt;</span><br><span class="line">        &lt;appender-ref ref&#x3D;&quot;fileWarnLog&quot; &#x2F;&gt;</span><br><span class="line">    &lt;&#x2F;root&gt;</span><br><span class="line">&lt;&#x2F;configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>更多请参考<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/fba0d8e0a017">logging日志-log4j、log4j 2、logback、commons-logging和…..</a></p>
+<p>上述代码请参考<a target="_blank" rel="noopener" href="https://gitee.com/dancer4code/spring-boot-lab/tree/master/exception-demo">gitee源码地址</a></p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/" rel="tag">spring boot</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%97%A5%E5%BF%97/" rel="tag">日志</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-spring/【转载】Spring容器初始化完成后执行初始化数据方法"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/08/04/spring/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%91Spring%E5%AE%B9%E5%99%A8%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%8C%E6%88%90%E5%90%8E%E6%89%A7%E8%A1%8C%E5%88%9D%E5%A7%8B%E5%8C%96%E6%95%B0%E6%8D%AE%E6%96%B9%E6%B3%95/"
+    >【转载】Spring容器初始化完成后执行初始化数据方法</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/08/04/spring/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%91Spring%E5%AE%B9%E5%99%A8%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%8C%E6%88%90%E5%90%8E%E6%89%A7%E8%A1%8C%E5%88%9D%E5%A7%8B%E5%8C%96%E6%95%B0%E6%8D%AE%E6%96%B9%E6%B3%95/" class="article-date">
+  <time datetime="2020-08-04T14:36:00.000Z" itemprop="datePublished">2020-08-04</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring/">spring</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>本文转载自：<a target="_blank" rel="noopener" href="https://blog.csdn.net/honghailiang888/article/details/73333821">https://blog.csdn.net/honghailiang888/article/details/73333821</a> </p>
+<h1 id="一、背景知识及需求"><a href="#一、背景知识及需求" class="headerlink" title="一、背景知识及需求"></a>一、背景知识及需求</h1><p>在做WEB项目时，经常在项目第一次启动时利用WEB容器的监听、Servlet加载初始化等切入点为数据库准备数据，这些初始化数据是系统开始运行前必须的数据，例如权限组、系统选项、默认管理员等等。而项目采用了Spring依赖注入来管理对象，而servlet并不受Spring的管理。若此时在servlet中注入Spring管理的对象，则无法使用，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public class InitServlet extends HttpServlet &#123;</span><br><span class="line"> </span><br><span class="line">    @Autowired</span><br><span class="line">    private IProductService productService;</span><br><span class="line">    @Autowired</span><br><span class="line">    private IUserService userService;</span><br><span class="line">......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个时候是无法使用上述中的两个service的，因为InitServlet不受Spring容器管理。虽然可以用getBean的方式手动获取service，但是违反了使用Spring的初衷。</p>
+<p>该篇文章也在之前<a target="_blank" rel="noopener" href="http://blog.csdn.net/honghailiang888/article/details/53113853">【Spring实战】系列</a>的基础上进行优化和深入分析，本篇就是在更换了hsqldb数据库并初始化了商品、普通用户和管理员用户需求时产生的。</p>
+<h1 id="二、Spring提供的解决方案"><a href="#二、Spring提供的解决方案" class="headerlink" title="二、Spring提供的解决方案"></a>二、Spring提供的解决方案</h1><h2 id="1、InitializingBean"><a href="#1、InitializingBean" class="headerlink" title="1、InitializingBean"></a>1、InitializingBean</h2><p>直接上代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;**</span><br><span class="line"> * Created by Administrator on 2017&#x2F;6&#x2F;15.</span><br><span class="line"> * spring容器启动后，初始化数据（产生一个默认商品、普通用户和管理员用户）</span><br><span class="line"> *&#x2F;</span><br><span class="line">@Component</span><br><span class="line">public class InitServlet implements InitializingBean &#123;</span><br><span class="line"> </span><br><span class="line">    @Autowired</span><br><span class="line">    private IProductService productService;</span><br><span class="line">    @Autowired</span><br><span class="line">    private IUserService userService;</span><br><span class="line"> </span><br><span class="line">    @Override</span><br><span class="line">    public void afterPropertiesSet() throws Exception &#123;</span><br><span class="line">        &#x2F;&#x2F;库中没有商品则声称一个</span><br><span class="line">        List&lt;Product&gt; products &#x3D; productService.getProductList();</span><br><span class="line">        if (null &#x3D;&#x3D; products || products.isEmpty())&#123;</span><br><span class="line">            Product product &#x3D; new Product();</span><br><span class="line">            product.setProductName(&quot;Mango&quot;);</span><br><span class="line">            product.setQuantity(100);</span><br><span class="line">            product.setUnit(&quot;个&quot;);</span><br><span class="line">            product.setUnitPrice(100);</span><br><span class="line">            productService.saveProduct(product);</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        &#x2F;&#x2F;库中没有用户则添加普通用户和管理员用户</span><br><span class="line">        List&lt;MangoUser&gt; mangoUsers &#x3D; userService.getUserList();</span><br><span class="line">        if(null &#x3D;&#x3D; mangoUsers || mangoUsers.isEmpty())&#123;</span><br><span class="line">            MangoUser mangoUser &#x3D; new MangoUser();</span><br><span class="line">            mangoUser.setUserName(&quot;mango&quot;);</span><br><span class="line">            mangoUser.setPassword(StringUtil.md5(&quot;123456&quot;));</span><br><span class="line">            mangoUser.setRole(&quot;ROLE_USER&quot;);</span><br><span class="line">            userService.saveUser(mangoUser);</span><br><span class="line"> </span><br><span class="line">            MangoUser mangoUser1 &#x3D; new MangoUser();</span><br><span class="line">            mangoUser1.setUserName(&quot;manager&quot;);</span><br><span class="line">            mangoUser1.setPassword(StringUtil.md5(&quot;123456&quot;));</span><br><span class="line">            mangoUser1.setRole(&quot;ROLE_MANAGER&quot;);</span><br><span class="line">            userService.saveUser(mangoUser1);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>若采用XML来配置Bean的话，可以指定属性init-method。</p>
+<h2 id="2、ApplicationListener"><a href="#2、ApplicationListener" class="headerlink" title="2、ApplicationListener"></a>2、ApplicationListener</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;交给Spring管理，如果不是自动扫描加载bean的方式，则在xml里配一个即可</span><br><span class="line">@Component</span><br><span class="line">public class InitData implements ApplicationListener&lt;ContextRefreshedEvent&gt; &#123;</span><br><span class="line"> </span><br><span class="line">    @Autowired</span><br><span class="line">    private IProductService productService;</span><br><span class="line">    @Autowired</span><br><span class="line">    private IUserService userService;</span><br><span class="line"> </span><br><span class="line">    @Override</span><br><span class="line">    public void onApplicationEvent(ContextRefreshedEvent event) &#123;</span><br><span class="line">        if (event.getApplicationContext().getParent() &#x3D;&#x3D; null) &#123;</span><br><span class="line">            &#x2F;&#x2F;库中没有商品则声称一个</span><br><span class="line">            List&lt;Product&gt; products &#x3D; productService.getProductList();</span><br><span class="line">            if (null &#x3D;&#x3D; products || products.isEmpty())&#123;</span><br><span class="line">                Product product &#x3D; new Product();</span><br><span class="line">                product.setProductName(&quot;Mango&quot;);</span><br><span class="line">                product.setQuantity(100);</span><br><span class="line">                product.setUnit(&quot;个&quot;);</span><br><span class="line">                product.setUnitPrice(100);</span><br><span class="line">                productService.saveProduct(product);</span><br><span class="line">            &#125;</span><br><span class="line"> </span><br><span class="line">            &#x2F;&#x2F;库中没有用户则添加普通用户和管理员用户</span><br><span class="line">            List&lt;MangoUser&gt; mangoUsers &#x3D; userService.getUserList();</span><br><span class="line">            if(null &#x3D;&#x3D; mangoUsers || mangoUsers.isEmpty())&#123;</span><br><span class="line">                MangoUser mangoUser &#x3D; new MangoUser();</span><br><span class="line">                mangoUser.setUserName(&quot;mango&quot;);</span><br><span class="line">                mangoUser.setPassword(StringUtil.md5(&quot;123456&quot;));</span><br><span class="line">                mangoUser.setRole(&quot;ROLE_USER&quot;);</span><br><span class="line">                userService.saveUser(mangoUser);</span><br><span class="line"> </span><br><span class="line">                MangoUser mangoUser1 &#x3D; new MangoUser();</span><br><span class="line">                mangoUser1.setUserName(&quot;manager&quot;);</span><br><span class="line">                mangoUser1.setPassword(StringUtil.md5(&quot;123456&quot;));</span><br><span class="line">                mangoUser1.setRole(&quot;ROLE_MANAGER&quot;);</span><br><span class="line">                userService.saveUser(mangoUser1);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意是监听的ContextRefreshedEvent事件。</p>
+<p>在web 项目中（spring mvc），系统会存在两个容器，一个是root application context ,另一个就是我们自己的 projectName-servlet context（作为root application context的子容器）。这种情况下，就会造成onApplicationEvent方法被执行两次。为了避免上面提到的问题，我们可以只在root application context初始化完成后调用逻辑代码，其他的容器的初始化完成，则不做任何处理。</p>
+<p>event.getApplicationContext().getParent() == null</p>
+<h2 id="3、-PostConstruct"><a href="#3、-PostConstruct" class="headerlink" title="3、@PostConstruct"></a>3、@PostConstruct</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;**</span><br><span class="line"> * Created by Administrator on 2017&#x2F;6&#x2F;15.</span><br><span class="line"> * spring容器启动后，初始化数据（产生一个默认商品、普通用户和管理员用户）</span><br><span class="line"> *&#x2F;</span><br><span class="line">@Component</span><br><span class="line">public class InitMango&#123;</span><br><span class="line"> </span><br><span class="line">    @Autowired</span><br><span class="line">    private IProductService productService;</span><br><span class="line">    @Autowired</span><br><span class="line">    private IUserService userService;</span><br><span class="line"> </span><br><span class="line">    @PostConstruct</span><br><span class="line">    public void init() &#123;</span><br><span class="line">        &#x2F;&#x2F;库中没有商品则声称一个</span><br><span class="line">        List&lt;Product&gt; products &#x3D; productService.getProductList();</span><br><span class="line">        if (null &#x3D;&#x3D; products || products.isEmpty())&#123;</span><br><span class="line">            Product product &#x3D; new Product();</span><br><span class="line">            product.setProductName(&quot;Mango&quot;);</span><br><span class="line">            product.setQuantity(100);</span><br><span class="line">            product.setUnit(&quot;个&quot;);</span><br><span class="line">            product.setUnitPrice(100);</span><br><span class="line">            productService.saveProduct(product);</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        &#x2F;&#x2F;库中没有用户则添加普通用户和管理员用户</span><br><span class="line">        List&lt;MangoUser&gt; mangoUsers &#x3D; userService.getUserList();</span><br><span class="line">        if(null &#x3D;&#x3D; mangoUsers || mangoUsers.isEmpty())&#123;</span><br><span class="line">            MangoUser mangoUser &#x3D; new MangoUser();</span><br><span class="line">            mangoUser.setUserName(&quot;mango&quot;);</span><br><span class="line">            mangoUser.setPassword(StringUtil.md5(&quot;123456&quot;));</span><br><span class="line">            mangoUser.setRole(&quot;ROLE_USER&quot;);</span><br><span class="line">            userService.saveUser(mangoUser);</span><br><span class="line"> </span><br><span class="line">            MangoUser mangoUser1 &#x3D; new MangoUser();</span><br><span class="line">            mangoUser1.setUserName(&quot;manager&quot;);</span><br><span class="line">            mangoUser1.setPassword(StringUtil.md5(&quot;123456&quot;));</span><br><span class="line">            mangoUser1.setRole(&quot;ROLE_MANAGER&quot;);</span><br><span class="line">            userService.saveUser(mangoUser1);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下篇文章会分析其原理和源码实现。</p>
+<h3 id="三、代码托管"><a href="#三、代码托管" class="headerlink" title="三、代码托管"></a>三、代码托管</h3><p><a target="_blank" rel="noopener" href="https://github.com/honghailiang/SpringMango">https://github.com/honghailiang/SpringMango</a> </p>
+<h3 id="四、实现原理"><a href="#四、实现原理" class="headerlink" title="四、实现原理"></a>四、实现原理</h3><p>其实现原理在<a target="_blank" rel="noopener" href="http://blog.csdn.net/honghailiang888/article/details/74981445">【Spring实战】Spring注解工作原理源码解析</a>中均能找到答案，简单说明下：</p>
+<p>1）在bean创建的过程中，初始化时会先调用@PostConstruct注解标注的方法，而后调用实现InitializingBean接口的afterPropertiesSet方法</p>
+<p>2）在finishRefresh()会分发事件，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; Publish the final event.		publishEvent(new ContextRefreshedEvent(this));</span><br></pre></td></tr></table></figure>
+
+<p>关心ContextRefreshedEvent事件的bean中的onApplicationEvent方法会被调用</p>
+<p>3）建议使用@PostConstruct注解，减少Spring的侵入性以及耦合性 </p>
+<p>本文转载自：<a target="_blank" rel="noopener" href="https://blog.csdn.net/honghailiang888/article/details/73333821">https://blog.csdn.net/honghailiang888/article/details/73333821</a> </p>
+<p>spring请参考<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/wenmingfeng1215/article/details/80405371">Spring容器初始化完成后执行初始化数据方法</a></p>
+<p>spring boot请参考<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/ClementAD/article/details/84345196">Spring boot 启动之后，执行某些初始化的几种方法</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_35981283/article/details/77826537">Spring Boot学习–项目启动时执行特定方法</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/ming19951224/article/details/81156904">springboot项目启动后，自动执行需要的初始化操作</a></p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/" rel="tag">spring</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-spring/spring集成测试环境的搭建"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/08/03/spring/spring%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83%E7%9A%84%E6%90%AD%E5%BB%BA/"
+    >spring集成测试环境的搭建</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/08/03/spring/spring%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83%E7%9A%84%E6%90%AD%E5%BB%BA/" class="article-date">
+  <time datetime="2020-08-03T14:36:00.000Z" itemprop="datePublished">2020-08-03</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring/">spring</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="1-加入依赖包"><a href="#1-加入依赖包" class="headerlink" title="1.加入依赖包"></a>1.加入依赖包</h2><p>使用Spring的测试框架需要加入以下依赖包：</p>
+<ul>
+<li><p>  JUnit 4 （官方下载：<a target="_blank" rel="noopener" href="http://www.junit.org/">http://www.junit.org/</a>）</p>
+</li>
+<li><p>  Spring Test （Spring框架中的test包）</p>
+</li>
+<li><p>  Spring 相关其他依赖包（不再赘述了，就是context等包）</p>
+</li>
+</ul>
+<h2 id="2-创建测试源目录和包"><a href="#2-创建测试源目录和包" class="headerlink" title="2. 创建测试源目录和包"></a>2. 创建测试源目录和包</h2><p>创建一个和src下面与main同级创建test目录（测试目录），基本上大的框架（像spring的测试文件就是这样的，这已经是默认的了）。</p>
+<h2 id="3-创建测试类"><a href="#3-创建测试类" class="headerlink" title="3. 创建测试类"></a>3. 创建测试类</h2><p>创建一个测试用的类，推荐名称为 “被测试类名称 + Test”。  创建测试类通常的两种方式：</p>
+<ol>
+<li><p> 根据需求继承必须的类</p>
+</li>
+<li><p> 根据需求加上必须的注解</p>
+</li>
+</ol>
+<p><strong>第一种方式</strong>：测试类应该继承与 AbstractJUnit4SpringContextTests 或 AbstractTransactionalJUnit4SpringContextTests</p>
+<ul>
+<li><p>  AbstractJUnit4springcontextTests （测试中不涉及事物）</p>
+</li>
+<li><p>  AbstractTransactionalJUnit4SpringContextTests （测试类中，需要用到事务管理）（比如要在测试结果出来之后回滚测试内容）</p>
+</li>
+</ul>
+<p><strong>第二种方式</strong>：使用注解</p>
+<ul>
+<li><p>  AbstractJUnit4springcontextTests可以用@RunWith(SpringJUnit4ClassRunner.class)来实现同样的功能</p>
+</li>
+<li><p>  AbstractTransactionalJUnit4SpringContextTests 可以用@RunWith(SpringJUnit4ClassRunner.class)+@TransactionConfiguration(transactionManager = “transactionManager”, defaultRollback = true)来实现同样的功能</p>
+</li>
+</ul>
+<h2 id="4-通过JUnit-4-执行或maven自动执行"><a href="#4-通过JUnit-4-执行或maven自动执行" class="headerlink" title="4. 通过JUnit 4 执行或maven自动执行"></a>4. 通过JUnit 4 执行或maven自动执行</h2><ul>
+<li><p>  Junit：右键方法名，选择则“Run As”→“JUnit Test”即可</p>
+</li>
+<li><p>  maven：默认自动回执行测试类，如果想要跳过测试可以添加如下命令：-Dmaven.test.skip=true</p>
+</li>
+</ul>
+<h2 id="5-测试代码解释（测试Controller层）"><a href="#5-测试代码解释（测试Controller层）" class="headerlink" title="5.测试代码解释（测试Controller层）"></a>5.测试代码解释（测试Controller层）</h2><p><strong>code</strong>  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">@Transactional&#x2F;&#x2F;每次都开启一个事务</span><br><span class="line">@WebAppConfiguration&#x2F;&#x2F;测试环境使用，用来表示测试环境使用的ApplicationContext将是WebApplicationContext类型的；</span><br><span class="line">@RunWith(SpringJUnit4ClassRunner.class)</span><br><span class="line">@ContextConfiguration(locations &#x3D; &#123;&quot;classpath*:spring-*.xml&quot;&#125;)</span><br><span class="line">@TransactionConfiguration(transactionManager &#x3D; &quot;transactionManager&quot;, defaultRollback &#x3D; true)</span><br><span class="line">public class BaseSpringJUnit &#123;</span><br><span class="line">	&#x2F;&#x2F;执行@Test标注的方法之前都执行这个方法</span><br><span class="line">	@Before</span><br><span class="line">	public void setUp() throws Exception &#123;</span><br><span class="line">		&#x2F;&#x2F;to doing somthing </span><br><span class="line">	&#125;</span><br><span class="line">	&#x2F;&#x2F;执行@Test标注的方法之之后都执行这个方法</span><br><span class="line">	@After</span><br><span class="line">	public void tearDown() throws Exception &#123;</span><br><span class="line">		&#x2F;&#x2F;to doing somthing</span><br><span class="line">	&#125;</span><br><span class="line">	&#x2F;&#x2F;测试方法</span><br><span class="line">	@Test</span><br><span class="line">	public void testPrint()&#123;</span><br><span class="line">		&#x2F;&#x2F;to doing somthing</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>@Transactional:每次都开启一个事务</p>
+<p>@WebAppConfiguration:测试环境使用，用来表示测试环境使用的ApplicationContext将是WebApplicationContext类型的；</p>
+<p>@ContextConfiguration(locations = {“classpath*:spring-*.xml”}):Spring整合JUnit4测试时，使用注解引入多个配置文件</p>
+<p>@RunWith(SpringJUnit4ClassRunner.class)和@TransactionConfiguration(transactionManager = “transactionManager”, defaultRollback = true)上面已经过</p>
+<p>其中：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mockMvc.perform(post(&quot;&#x2F;a&#x2F;pro&#x2F;unit&#x2F;list&quot;).param(&quot;name&quot;, &quot;s&quot;)).andExpect(MockMvcResultMatchers.view().name(&quot;modules&#x2F;pro&#x2F;unitList&quot;)) </span><br><span class="line">.andExpect(MockMvcResultMatchers.model().attributeExists(&quot;page&quot;)) </span><br><span class="line">.andExpect(MockMvcResultMatchers.jsonPath(&quot;$.code&quot;).value(&quot;10000&quot;)) </span><br><span class="line">.andDo(MockMvcResultHandlers.print()) </span><br><span class="line">.andReturn();</span><br></pre></td></tr></table></figure>
+
+<p>其中使用MockMvcResultMatchers.jsonPath(“$.code”).value(“10000”)，需要导入jar包</p>
+<p><strong>pom.xml配置需要加上</strong>  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">           &lt;groupId&gt;com.jayway.jsonpath&lt;&#x2F;groupId&gt;</span><br><span class="line">           &lt;artifactId&gt;json-path&lt;&#x2F;artifactId&gt;</span><br><span class="line">           &lt;version&gt;0.8.1&lt;&#x2F;version&gt;</span><br><span class="line">           &lt;scope&gt;test&lt;&#x2F;scope&gt;</span><br><span class="line">       &lt;&#x2F;dependency&gt;</span><br><span class="line">     &lt;dependency&gt;</span><br><span class="line">           &lt;groupId&gt;com.jayway.jsonpath&lt;&#x2F;groupId&gt;</span><br><span class="line">           &lt;artifactId&gt;json-path-assert&lt;&#x2F;artifactId&gt;</span><br><span class="line">           &lt;version&gt;0.8.1&lt;&#x2F;version&gt;</span><br><span class="line">           &lt;scope&gt;test&lt;&#x2F;scope&gt;</span><br><span class="line">   &lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>最后整个过程：</strong></p>
+<ul>
+<li><p>  1、mockMvc.perform执行一个请求；</p>
+</li>
+<li><p>  2、MockMvcRequestBuilders.get(“/user/1”)构造一个请求</p>
+</li>
+<li><p>  3、ResultActions.andExpect添加执行完成后的断言</p>
+</li>
+<li><p>  4、ResultActions.andDo添加一个结果处理器，表示要对结果做点什么事情，比如此处使用MockMvcResultHandlers.print()输出整个响应结果信息。</p>
+</li>
+<li><p>  5、ResultActions.andReturn表示执行完成后返回相应的结果。</p>
+</li>
+</ul>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/" rel="tag">spring</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-spring/@Configuration与@Configurable的比较"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/08/02/spring/@Configuration%E4%B8%8E@Configurable%E7%9A%84%E6%AF%94%E8%BE%83/"
+    >关于@Configuration与@Configurable的比较</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/08/02/spring/@Configuration%E4%B8%8E@Configurable%E7%9A%84%E6%AF%94%E8%BE%83/" class="article-date">
+  <time datetime="2020-08-02T14:36:00.000Z" itemprop="datePublished">2020-08-02</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring/">spring</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>#@Configuration<br>@Configuration就是以前spring的xml配置文件中的<beans> 的java实现，而@Bean就相当于<bean><br>@Configuration+@Bean就实现了spring以前配置文件中的类的配置加载。</p>
+<p>#@Configurable<br>主要是这个注解以前了解的不多。百度了一下，才知道其主要作用</p>
+<blockquote>
+<p>主要是适用于，某些自己new出来的对象，而new这个对象又必须依赖spring容器里的对象，才能完成一些工作。</p>
+</blockquote>
+<p>具体怎么运用。</p>
+<p>##1.添加依赖</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">       &lt;groupId&gt;org.springframework&lt;&#x2F;groupId&gt;</span><br><span class="line">       &lt;artifactId&gt;spring-aspects&lt;&#x2F;artifactId&gt;</span><br><span class="line">       &lt;version&gt;5.1.9.RELEASE&lt;&#x2F;version&gt;</span><br><span class="line"> &lt;&#x2F;dependency&gt;</span><br><span class="line"> &lt;dependency&gt;</span><br><span class="line">       &lt;groupId&gt;org.springframework&lt;&#x2F;groupId&gt;</span><br><span class="line">       &lt;artifactId&gt;spring-instrument&lt;&#x2F;artifactId&gt;</span><br><span class="line">       &lt;version&gt;5.1.9.RELEASE&lt;&#x2F;version&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<p>##2.具体的类<br><code>Student</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.custombean.config;</span><br><span class="line"></span><br><span class="line">import org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line">@Component</span><br><span class="line">public class Student &#123;</span><br><span class="line"></span><br><span class="line">    public void study()&#123;</span><br><span class="line">        System.out.println(&quot;I am a student,I must to study!&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><code>People</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.custombean.config;</span><br><span class="line"></span><br><span class="line">import org.springframework.beans.factory.annotation.Configurable;</span><br><span class="line"></span><br><span class="line">import javax.annotation.Resource;</span><br><span class="line"></span><br><span class="line">@Configurable</span><br><span class="line">public class People &#123;</span><br><span class="line"></span><br><span class="line">    @Resource</span><br><span class="line">    private Student student;</span><br><span class="line"></span><br><span class="line">    public void doSomething()&#123;</span><br><span class="line">        student.study();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><code>启动类加注解@SpringBootApplication+@EnableSpringConfigured</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.custombean;</span><br><span class="line"></span><br><span class="line">import org.springframework.boot.SpringApplication;</span><br><span class="line">import org.springframework.boot.autoconfigure.SpringBootApplication;</span><br><span class="line">import org.springframework.boot.web.servlet.ServletComponentScan;</span><br><span class="line">import org.springframework.context.annotation.Configuration;</span><br><span class="line">import org.springframework.context.annotation.EnableLoadTimeWeaving;</span><br><span class="line">import org.springframework.context.annotation.aspectj.EnableSpringConfigured;</span><br><span class="line"></span><br><span class="line">@ServletComponentScan</span><br><span class="line">@SpringBootApplication</span><br><span class="line">@EnableSpringConfigured</span><br><span class="line">@EnableLoadTimeWeaving</span><br><span class="line">public class CustomBeanApplication &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        SpringApplication.run(CustomBeanApplication.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<p><code>测试类</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">package com.d4c.custombean.config;</span><br><span class="line"></span><br><span class="line">import org.junit.Test;</span><br><span class="line">import org.junit.runner.RunWith;</span><br><span class="line">import org.springframework.boot.test.context.SpringBootTest;</span><br><span class="line">import org.springframework.test.context.junit4.SpringRunner;</span><br><span class="line"></span><br><span class="line">@SpringBootTest</span><br><span class="line">@RunWith(SpringRunner.class)</span><br><span class="line">public class PeopleTest &#123;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void doSomething() &#123;</span><br><span class="line">        People people &#x3D; new People();</span><br><span class="line">        people.doSomething();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="配置jvm参数"><a href="#配置jvm参数" class="headerlink" title="配置jvm参数"></a>配置jvm参数</h2><p>不配置是会报错的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-javaagent:E:\maven_repository\org\springframework\spring-instrument\5.1.9.RELEASE\spring-instrument-5.1.9.RELEASE.jar</span><br><span class="line">&#x2F;&#x2F;直接指定spring-instrument.jar的maven本地仓库的地址就行</span><br></pre></td></tr></table></figure>
+
+<p>如图：<br><img src="https://upload-images.jianshu.io/upload_images/19382524-832eae8f346fda47.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<h2 id="OK-，可以了"><a href="#OK-，可以了" class="headerlink" title="OK ，可以了"></a>OK ，可以了</h2> 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/" rel="tag">spring</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+    <article
+  id="post-other/技术博客列表"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2020/08/01/other/%E6%8A%80%E6%9C%AF%E5%8D%9A%E5%AE%A2%E5%88%97%E8%A1%A8/"
+    >地址引用</a> 
+</h2>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/08/01/other/%E6%8A%80%E6%9C%AF%E5%8D%9A%E5%AE%A2%E5%88%97%E8%A1%A8/" class="article-date">
+  <time datetime="2020-08-01T14:36:00.000Z" itemprop="datePublished">2020-08-01</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%85%B6%E5%AE%83/">其它</a>
+  </div>
+   
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>#Jackson<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44747933/article/details/108301626">史上最全的Jackson框架使用教程</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/u011054333/article/details/80504154">Jackson快速入门</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/sdyy321/article/details/40298081">jackson annotations注解详解</a></p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/other/" rel="tag">other</a></li></ul>
+
+    </footer>
+  </div>
+
+    
+ 
+   
+</article>
+
+    
+  </article>
+  
+
+  
+  <nav class="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/">上一页</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/">下一页</a>
+  </nav>
+  
+</section>
+</div>
+
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2020
+        <i class="ri-heart-fill heart_icon"></i> d4c
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        
+        由 <a href="https://hexo.io" target="_blank">Hexo</a> 强力驱动
+        <span class="division">|</span>
+        主题 - <a href="https://github.com/Shen-Yu/hexo-theme-ayer" target="_blank">Ayer</a>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></s>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+      <div class="float_btns">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+      </div>
+    </main>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-side.svg" alt="D4C的世界"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" target="_blank" rel="noopener" href="https://www.jianshu.com/u/060a97a8dfe1">简书</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <script>
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        document.querySelector('.content').classList.remove('on');
+        document.querySelector('.sidebar').classList.remove('on');
+      }
+    </script>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script>
+
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+
+
+<link rel="stylesheet" href="/css/clipboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+
+
+<!-- CanvasBackground -->
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="52"
+        src="//music.163.com/outchain/player?type=2&id=357126&auto=0&height=32"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+  </div>
+</body>
+
+</html>
