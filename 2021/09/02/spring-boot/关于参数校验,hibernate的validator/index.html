@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta name="description" content="我是一位牧码人，快放码过来，" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>关于参数校验，hibernate的validator 的校验 |  D4C的世界</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/favicon.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css"
+      />
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="D4C的世界" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-spring-boot/关于参数校验,hibernate的validator"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  关于参数校验，hibernate的validator 的校验
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2021/09/02/spring-boot/%E5%85%B3%E4%BA%8E%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C,hibernate%E7%9A%84validator/" class="article-date">
+  <time datetime="2021-09-02T02:22:00.000Z" itemprop="datePublished">2021-09-02</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring-boot/">spring boot</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">2.4k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">12 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="关于参数校验，hibernate的validator-的校验"><a href="#关于参数校验，hibernate的validator-的校验" class="headerlink" title="关于参数校验，hibernate的validator 的校验"></a>关于参数校验，hibernate的validator 的校验</h1><h2 id="1-注解式校验"><a href="#1-注解式校验" class="headerlink" title="1.注解式校验"></a>1.注解式校验</h2><h3 id="1-1-常见校验注解"><a href="#1-1-常见校验注解" class="headerlink" title="1.1 常见校验注解"></a>1.1 常见校验注解</h3><blockquote>
+<p><strong>定义的校验类型</strong></p>
+<p>@Null 验证对象是否为null<br>@NotNull 验证对象是否不为null, 无法查检长度为0的字符串<br>@NotBlank 检查约束字符串是不是Null还有被Trim的长度是否大于0,只对字符串,且会去掉前后空格.<br>@NotEmpty 检查约束元素是否为NULL或者是EMPTY.<br>@CreditCardNumber信用卡验证<br>@Email 验证是否是邮件地址，如果为null,不进行验证，算通过验证。<br>@URL(protocol=,host=, port=,regexp=, flags=) ip地址校验</p>
+<p><strong>Booelan检查</strong></p>
+<p>@AssertTrue 验证 Boolean 对象是否为 true<br>@AssertFalse 验证 Boolean 对象是否为 false</p>
+<p><strong>长度检查</strong><br>@Size(min=, max=) 验证对象（Array,Collection,Map,String）长度是否在给定的范围之内<br>@Length(min=, max=) Validates that the annotated string is between min and max included.</p>
+<p><strong>日期检查</strong><br>@Past 验证 Date 和 Calendar 对象是否在当前时间之前<br>@Future 验证 Date 和 Calendar 对象是否在当前时间之后<br>@Pattern 验证 String 对象是否符合正则表达式的规则</p>
+<p><strong>数值检查，</strong>建议使用在Stirng,Integer类型，不建议使用在int类型上，因为表单值为””时无法转换为int，但可以转换为Stirng为””,Integer为null<br>@Min 验证 Number 和 String 对象是否大等于指定的值<br>@Max 验证 Number 和 String 对象是否小等于指定的值<br>@DecimalMax 被标注的值必须不大于约束中指定的最大值. 这个约束的参数是一个通过BigDecimal定义的最大值的字符串表示.小数存在精度<br>@DecimalMin 被标注的值必须不小于约束中指定的最小值. 这个约束的参数是一个通过BigDecimal定义的最小值的字符串表示.小数存在精度<br>@Digits 验证 Number 和 String 的构成是否合法<br>@Digits(integer=,fraction=) 验证字符串是否是符合指定格式的数字，interger指定整数精度，fraction指定小数精度。<br>@Range(min=, max=) Checks whether the annotated value lies between (inclusive) the specified minimum and maximum.</p>
+</blockquote>
+<h3 id="1-2-实现简单的注解式校验栗子"><a href="#1-2-实现简单的注解式校验栗子" class="headerlink" title="1.2 实现简单的注解式校验栗子"></a>1.2 实现简单的注解式校验栗子</h3><h4 id="1-2-1-请求实体"><a href="#1-2-1-请求实体" class="headerlink" title="1.2.1 请求实体"></a>1.2.1 请求实体</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CommonReqVO</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 互感器主键</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@NotNull(message = &quot;业务类型不能为空&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String type;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 请求数据</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Valid</span></span><br><span class="line">    <span class="meta">@NotNull(message = &quot;数据不能为空&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> T data;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@NotNull(message = &quot;开始时间不能为空！&quot;)</span></span><br><span class="line">    <span class="meta">@Pattern(regexp = &quot;^((([0-9]&#123;3&#125;[1-9]|[0-9]&#123;2&#125;[1-9][0-9]&#123;1&#125;|[0-9]&#123;1&#125;[1-9][0-9]&#123;2&#125;|[1-9][0-9]&#123;3&#125;)-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]&#123;2&#125;)(0[4]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29))\\s+([0-1]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$&quot;,message = &quot;日期格式不正确&quot;)</span></span><br><span class="line"><span class="comment">//    @DateTime(format = &quot;yyyy-MM-dd&quot;, message = &quot;时间格式错误，格式应为&#x27;yyyy-MM-dd&#x27;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String startDate;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserVO</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@NotBlank(message = &quot;name不能为空&quot;,groups = S1.class)</span></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="meta">@Range(min = 1,max = 120,message = &quot;年龄必须在1-120之间&quot;,groups = S1.class)</span></span><br><span class="line">    <span class="keyword">private</span> Integer age;</span><br><span class="line">    <span class="meta">@NotBlank(message = &quot;address不能为空&quot;,groups = S2.class)</span></span><br><span class="line">    <span class="keyword">private</span> String address;</span><br><span class="line">    <span class="meta">@NotBlank(message = &quot;phone不能为空&quot;,groups = S2.class)</span></span><br><span class="line">    <span class="keyword">private</span> String phone;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">S1</span></span>&#123;&#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">S2</span></span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="1-2-2-controller"><a href="#1-2-2-controller" class="headerlink" title="1.2.2 controller"></a>1.2.2 controller</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;test&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestController</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@PostMapping(&quot;t3&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">test3</span><span class="params">(<span class="meta">@RequestBody</span> CommonReqVO&lt;UserVO&gt; userVO)</span></span>&#123;</span><br><span class="line">        ValidateUtil.validateParams(userVO,<span class="string">&quot;请求参数不能为空&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">&quot;01&quot;</span>.equals(userVO.getType()))&#123;</span><br><span class="line">            ValidateUtil.validateParams(userVO,<span class="string">&quot;请求参数不能为空&quot;</span>,UserVO.S1.class);</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="string">&quot;02&quot;</span>.equals(userVO.getType()))&#123;</span><br><span class="line">            ValidateUtil.validateParams(userVO,<span class="string">&quot;请求参数不能为空&quot;</span>,UserVO.S2.class);</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> CustomException(<span class="string">&quot;请求参数type类型不匹配！&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;t3&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PostMapping(&quot;t4&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">test4</span><span class="params">(<span class="meta">@RequestBody</span> <span class="meta">@Validated</span> CommonReqVO&lt;UserVO&gt; userVO)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;4&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="1-2-3-统一异常处理类及相关类"><a href="#1-2-3-统一异常处理类及相关类" class="headerlink" title="1.2.3 统一异常处理类及相关类"></a>1.2.3 统一异常处理类及相关类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestControllerAdvice</span></span><br><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExceptionHandle</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;validator.showField:false&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> Boolean showFile;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ExceptionHandler(CustomException.class)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ResultInfo <span class="title">handleCustomException</span><span class="params">(CustomException e)</span></span>&#123;</span><br><span class="line">        log.error(<span class="string">&quot;【用户自定义异常】&#123;&#125;&quot;</span>, e);</span><br><span class="line">        <span class="keyword">return</span> ResultInfoUtil.error(e.getCode(), e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ExceptionHandler(HttpMediaTypeNotSupportedException.class)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ResultInfo <span class="title">handleReqException</span><span class="params">(HttpMediaTypeNotSupportedException e)</span></span>&#123;</span><br><span class="line">        log.error(<span class="string">&quot;【请求类型不支持异常】&#123;&#125;&quot;</span>, e);</span><br><span class="line">        <span class="keyword">if</span> (e.getMessage().contains(<span class="string">&quot;not supported&quot;</span>))&#123;</span><br><span class="line">            <span class="keyword">return</span> ResultInfoUtil.error(<span class="number">0</span>, <span class="string">&quot;请求Content-Type不匹配&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ResultInfoUtil.error(<span class="number">0</span>, e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@ExceptionHandler(HttpMessageNotReadableException.class)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ResultInfo <span class="title">handleReqBodyException</span><span class="params">(HttpMessageNotReadableException e)</span></span>&#123;</span><br><span class="line">        log.error(<span class="string">&quot;【请求体异常】&#123;&#125;&quot;</span>, e);</span><br><span class="line">        <span class="keyword">if</span> (e.getMessage().contains(<span class="string">&quot;Required request body is missing&quot;</span>))&#123;</span><br><span class="line">            <span class="keyword">return</span> ResultInfoUtil.error(<span class="number">0</span>, <span class="string">&quot;请求体不能为空&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ResultInfoUtil.error(<span class="number">0</span>, e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@ExceptionHandler(Exception.class)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ResultInfo <span class="title">handleOtherException</span><span class="params">(Exception e)</span></span>&#123;</span><br><span class="line">        log.error(<span class="string">&quot;【系统异常】&#123;&#125;&quot;</span>, e);</span><br><span class="line">        <span class="keyword">return</span> ResultInfoUtil.error(<span class="number">0</span>, e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 处理validation框架中的&#123;<span class="doctag">@link</span> MethodArgumentNotValidException&#125;异常</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;该异常一般出在用&#123;<span class="doctag">@code</span> <span class="doctag">@RequestBody</span>&#125;注解标记的参数校验，在对象中的参数有问题是抛出&lt;/p&gt;</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> e &#123;<span class="doctag">@link</span> MethodArgumentNotValidException&#125;</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> &#123;<span class="doctag">@link</span> ResultInfo&#125;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler(MethodArgumentNotValidException.class)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ResultInfo <span class="title">doNoValidExceptionHandler</span><span class="params">(MethodArgumentNotValidException e)</span> </span>&#123;</span><br><span class="line">        log.info(<span class="string">&quot;捕捉到参数校验异常： [&#123;&#125;]&quot;</span>, e);</span><br><span class="line">        <span class="keyword">return</span> validationExceptionHandler(e.getBindingResult(), e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 处理validation框架中的&#123;<span class="doctag">@link</span> ConstraintDeclarationException&#125;异常</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;该异常一般出在用&#123;<span class="doctag">@code</span> <span class="doctag">@RequestParam</span>&#125;注解标记的参数校验&lt;/p&gt;</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> e &#123;<span class="doctag">@link</span> ConstraintDeclarationException&#125;</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> &#123;<span class="doctag">@link</span> ResultInfo&#125;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler(ConstraintDeclarationException.class)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ResultInfo <span class="title">doNoValidExceptionHandler</span><span class="params">(ConstraintDeclarationException e)</span> </span>&#123;</span><br><span class="line">        String errorMsg = e.getMessage();</span><br><span class="line">        log.info(<span class="string">&quot;捕捉到参数校验异常： [&#123;&#125;]&quot;</span>, errorMsg, e);</span><br><span class="line">        <span class="keyword">return</span> ResultInfoUtil.error(<span class="number">0</span>, e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 处理validation框架中的&#123;<span class="doctag">@link</span> BindException&#125;异常</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;该异常一般出在用&#123;<span class="doctag">@code</span> <span class="doctag">@RequestBody</span>&#125;注解标记的参数校验，在对象嵌套类型参数有问题时抛出&lt;/p&gt;</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> e &#123;<span class="doctag">@link</span> BindException&#125;</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> &#123;<span class="doctag">@link</span> ResultInfo&#125;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ExceptionHandler(BindException.class)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ResultInfo <span class="title">doNoValidExceptionHandler</span><span class="params">(BindException e)</span> </span>&#123;</span><br><span class="line">        log.info(<span class="string">&quot;捕捉到参数校验异常： [&#123;&#125;]&quot;</span>, e);</span><br><span class="line">        <span class="keyword">return</span> validationExceptionHandler(e.getBindingResult(), e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 处理validation框架的异常</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> bindingResult &#123;<span class="doctag">@link</span> BindingResult&#125; 异常绑定的对象信息</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> message       异常信息</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> &#123;<span class="doctag">@link</span> ResultInfo&#125;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> ResultInfo <span class="title">validationExceptionHandler</span><span class="params">(BindingResult bindingResult, String message)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//默认捕获第一个不符合校验规则的错误信息</span></span><br><span class="line">        <span class="comment">//错误字段对象</span></span><br><span class="line">        List&lt;FieldError&gt; fieldErrors = bindingResult.getFieldErrors();</span><br><span class="line">        List&lt;String&gt; errorMessages = <span class="keyword">new</span> ArrayList&lt;&gt;(fieldErrors.size());</span><br><span class="line">        <span class="keyword">if</span> (showFile)&#123;</span><br><span class="line">            fieldErrors.stream().forEach(e-&gt;&#123;</span><br><span class="line">                errorMessages.add(e.getField()+<span class="string">&quot;-&quot;</span>+e.getDefaultMessage());</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            fieldErrors.stream().forEach(e-&gt;&#123;</span><br><span class="line">                errorMessages.add(e.getDefaultMessage());</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        log.info(<span class="string">&quot;捕捉到参数校验异常详情： &#123;&#125;&quot;</span>, errorMessages);</span><br><span class="line">        <span class="keyword">return</span> ResultInfoUtil.error(<span class="number">0</span>, errorMessages.toString());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ResultInfo</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *返回码</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> Integer code;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *返回提示信息</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> String msg;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *返回具体对象</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> T data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ResultInfoUtil</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ResultInfo <span class="title">success</span><span class="params">(Object object)</span> </span>&#123;</span><br><span class="line">        ResultInfo result = <span class="keyword">new</span> ResultInfo();</span><br><span class="line">        ResultInfoEnum successEnum = ResultInfoEnum.SUCCESS;</span><br><span class="line">        result.setCode(successEnum.getCode());</span><br><span class="line">        result.setMsg(successEnum.getMsg());</span><br><span class="line">        result.setData(object);</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ResultInfo <span class="title">success</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> success(<span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ResultInfo <span class="title">error</span><span class="params">(Integer code, String msg)</span> </span>&#123;</span><br><span class="line">        ResultInfo result = <span class="keyword">new</span> ResultInfo();</span><br><span class="line">        result.setCode(code);</span><br><span class="line">        result.setMsg(msg);</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomException</span> <span class="keyword">extends</span> <span class="title">RuntimeException</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Integer code;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CustomException</span><span class="params">(ResultInfoEnum resultInfoEnum)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(resultInfoEnum.getMsg());</span><br><span class="line">        <span class="keyword">this</span>.code = resultInfoEnum.getCode();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CustomException</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(msg);</span><br><span class="line">        <span class="keyword">this</span>.code = ResultInfoEnum.FAILED.getCode();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>注意上面配置了 failFast 为false。所以会校验全部参数</p>
+</blockquote>
+<h4 id="1-2-4-请求及响应"><a href="#1-2-4-请求及响应" class="headerlink" title="1.2.4 请求及响应"></a>1.2.4 请求及响应</h4><p><strong>请求</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>响应</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;code&quot;</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="attr">&quot;msg&quot;</span>: <span class="string">&quot;[data-数据不能为空, type-业务类型不能为空, startDate-开始时间不能为空！]&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;data&quot;</span>: <span class="literal">null</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="2-编程式校验"><a href="#2-编程式校验" class="headerlink" title="2.编程式校验"></a>2.编程式校验</h2><h3 id="2-1-校验相关类"><a href="#2-1-校验相关类" class="headerlink" title="2.1 校验相关类"></a>2.1 校验相关类</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ValidateUtil</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Validator validator;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 是否启用快速失败</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Boolean failFast;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 是否显示错误字段</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Boolean showField;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setFailFast</span><span class="params">(Boolean failFast)</span> </span>&#123;</span><br><span class="line">        ValidateUtil.failFast = failFast;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setShowField</span><span class="params">(Boolean showField)</span> </span>&#123;</span><br><span class="line">        ValidateUtil.showField = showField;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> obj 校验的对象</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> &lt;T&gt;</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; Set&lt;ConstraintViolation&lt;T&gt;&gt; validate(T obj, Class... groupClasses) &#123;</span><br><span class="line">        Set&lt;ConstraintViolation&lt;T&gt;&gt; constraintViolations;</span><br><span class="line">        <span class="keyword">if</span> (groupClasses != <span class="keyword">null</span> &amp;&amp; groupClasses.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            constraintViolations = validator.validate(obj, groupClasses);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            constraintViolations = validator.validate(obj);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> constraintViolations;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 验证请求参数是否为空</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> o   参数对象</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> msg 报错信息</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">checkIsNotNull</span><span class="params">(Object o, String msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (o == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> CustomException(msg);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function"><span class="keyword">void</span> <span class="title">validateParams</span><span class="params">(T t, String msg, Class... groupClasses)</span> </span>&#123;</span><br><span class="line">        checkIsNotNull(t, msg);</span><br><span class="line">        Set&lt;ConstraintViolation&lt;T&gt;&gt; constraintViolationSet = validate(t, groupClasses);</span><br><span class="line">        List&lt;String&gt; resultString = <span class="keyword">new</span> ArrayList&lt;&gt;(constraintViolationSet.size());</span><br><span class="line">        <span class="keyword">if</span> (!constraintViolationSet.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (showField)&#123;</span><br><span class="line">                constraintViolationSet.stream().forEach(c -&gt; &#123;</span><br><span class="line">                    resultString.add(c.getPropertyPath().toString() + <span class="string">&quot;-&quot;</span> + c.getMessage());</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                constraintViolationSet.stream().forEach(c -&gt; &#123;</span><br><span class="line">                    resultString.add(c.getMessage());</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> CustomException(resultString.toString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 注入validator</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> validatorBean</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setValidator</span><span class="params">(Validator validatorBean)</span> </span>&#123;</span><br><span class="line">        validator = validatorBean;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ValidatorConfiguration</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;validator.failFast:true&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> Boolean failFast;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;validator.showField:false&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> Boolean showField;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> ServletContext servletContext;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Validator <span class="title">validator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ValidatorFactory validatorFactory = Validation.byProvider(HibernateValidator.class)</span><br><span class="line">                .configure()</span><br><span class="line">                <span class="comment">// 快速失败</span></span><br><span class="line">                .failFast(failFast)</span><br><span class="line">                .buildValidatorFactory();</span><br><span class="line">        <span class="keyword">return</span> validatorFactory.getValidator();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 给ValidateUtil初始化</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initValidateUtil</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);</span><br><span class="line">        Validator validator = (Validator) applicationContext.getBean(<span class="string">&quot;validator&quot;</span>);</span><br><span class="line">        ValidateUtil.setValidator(validator);</span><br><span class="line">        ValidateUtil.setFailFast(failFast);</span><br><span class="line">        ValidateUtil.setShowField(showField);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="2-2-配置"><a href="#2-2-配置" class="headerlink" title="2.2 配置"></a>2.2 配置</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#校验相关配置</span></span><br><span class="line"><span class="attr">validator:</span></span><br><span class="line">  <span class="comment">#快速失败</span></span><br><span class="line">  <span class="attr">failFast:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment">#错误提示是否显示错误字段</span></span><br><span class="line">  <span class="attr">showField:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="3-自定义校验注解"><a href="#3-自定义校验注解" class="headerlink" title="3.自定义校验注解"></a>3.自定义校验注解</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target(&#123;ElementType.FIELD, ElementType.PARAMETER&#125;)</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Constraint(validatedBy = DateTime.DateTimeValidator.class)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> DateTime &#123;</span><br><span class="line"></span><br><span class="line">    <span class="function">String <span class="title">message</span><span class="params">()</span> <span class="keyword">default</span> &quot;格式错误&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">String <span class="title">format</span><span class="params">()</span> <span class="keyword">default</span> &quot;yyyyMM&quot;</span>;</span><br><span class="line"></span><br><span class="line">    Class&lt;?&gt;[] groups() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    Class&lt;? extends Payload&gt;[] payload() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">DateTimeValidator</span> <span class="keyword">implements</span> <span class="title">ConstraintValidator</span>&lt;<span class="title">DateTime</span>, <span class="title">String</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> DateTime dateTime;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initialize</span><span class="params">(DateTime dateTime)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.dateTime = dateTime;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isValid</span><span class="params">(String value, ConstraintValidatorContext context)</span> </span>&#123;</span><br><span class="line">            <span class="comment">// 如果 value 为空则不进行格式验证，为空验证可以使用 @NotBlank @NotNull @NotEmpty 等注解来进行控制，职责分离</span></span><br><span class="line">            <span class="keyword">if</span> (value == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            String format = dateTime.format();</span><br><span class="line">            <span class="keyword">if</span> (value.length() != format.length()) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            SimpleDateFormat simpleDateFormat = <span class="keyword">new</span> SimpleDateFormat(format);</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                simpleDateFormat.parse(value);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="3-1-使用方法"><a href="#3-1-使用方法" class="headerlink" title="3.1 使用方法"></a>3.1 使用方法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@DateTime(format = &quot;yyyy-MM-dd&quot;, message = &quot;时间格式错误，格式应为&#x27;yyyy-MM-dd&#x27;&quot;)</span></span><br><span class="line"><span class="keyword">private</span> String startDate;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2021/09/02/spring-boot/%E5%85%B3%E4%BA%8E%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C,hibernate%E7%9A%84validator/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/" rel="tag">spring boot</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/validator/" rel="tag">validator</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+    
+      <a href="/2020/10/04/spring-cloud/spring-cloud%E4%B9%8Bzuul(%E8%BD%AC%E8%BD%BD)/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">spring-cloud之zuul(转载)</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "3gcpWx6bs3S9uReY88QfxhpS-gzGzoHsz",
+    app_key: "T2FSJRAUL8TxlahrkF0iJgtz",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2020-2021
+        <i class="ri-heart-fill heart_icon"></i> d4c
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        
+        由 <a href="https://hexo.io" target="_blank">Hexo</a> 强力驱动
+        <span class="division">|</span>
+        主题 - <a href="https://github.com/Shen-Yu/hexo-theme-ayer" target="_blank">Ayer</a>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1279387747&amp;web_id=1279387747'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-side.svg" alt="D4C的世界"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E6%97%85%E8%A1%8C/">旅行</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" target="_blank" rel="noopener" href="http://shenyu-vip.lofter.com">摄影</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" target="_blank" rel="noopener" href="https://www.jianshu.com/u/060a97a8dfe1">简书</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/player">播放器</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+</body>
+
+</html>
